@@ -16,6 +16,13 @@ def get_standard_lst():
 standardlst = get_standard_lst()
 standardlst = [tmp[0] for tmp in standardlst]
 
+def is_std(object_val):
+    name = object_val.lower()
+    for i in standardlst:
+        if name in i:
+            return True
+    return False
+
 def gen_biaslst():
     fitname = os.listdir(os.getcwd() + os.sep + 'bias')
     fitname = [i for i in fitname if i[-5:] == '.fits']
@@ -25,7 +32,7 @@ def gen_biaslst():
         f = open(path + 'spec_bias.lst', 'w')
         for i in fitname:
             print(i + ' === > spec_bias.lst')
-            f.write(path + i + '\n')
+            f.write( i + '\n')
         f.close()
     else:
         print('no bias found')
@@ -41,23 +48,55 @@ def gen_otherlst(path):
     cor_halogen = []
     lamp = []
     cor_lamp = []
-    obj = []
     std = []
+    cor_std = []
     for i in fitname:
         fit = pyfits.open(i)
         name = fit[0].header['object'].lower()
-        fit.close()
         if 'halogen' in name:
             halogen.append(i)
         else:
             cor_halogen.append(i)
-            if 
-    halogenf = open('halogen.lst','w')
-    cor_halogenf = open('cor_halogen.lst','w')
-    lampf = open('lamp.lst','w')
-    cor_lampf = open('cor_lamp.lst','w')
-    objf = open('obj.lst','w')
-    stdf = open('std.lst','w')
+            if fit[0].header['CLAMP2'] == 1 or fit[0].header['CLAMP3'] == 1 \
+                    fit[0].header['CLAMP4'] == 1:
+                lamp.append(i)
+            else:
+                cor_lamp.append(i)
+                if is_std(i):
+                    std.append(i)
+                else:
+                    cor_std.append(i)
+        fit.close()
+    if len(cor_std) > 0:
+        if len(halogen) > 0:
+            f = open('halogen.lst','w')
+            for name in halogen:
+                f.write(name + '\n')
+            f.close()
+        if len(cor_halogen) > 0:
+            f = open('cor_halogen.lst','w')
+            for name in cor_halogen:
+                f.write(name + '\n')
+            f.close()
+        if len(lamp) > 0:
+            f = open('lamp.lst','w')
+            for name in lamp:
+                f.write(name + '\n')
+            f.close()
+        if len(cor_lamp) > 0:
+            f = open('cor_lamp.lst','w')
+            for name in cor_lamp:
+                f.write(name + '\n')
+            f.close()
+        if len(std) > 0:
+            f = open('std.lst','w')
+            for name in std:
+                f.write(name + '\n')
+            f.close()
+        f = open('cor_std.lst','w')
+        for name in cor_std:
+            f.write(name + '\n')
+        f.close()
     
 
 def main():
