@@ -19,19 +19,20 @@ standardlst = [tmp[0] for tmp in standardlst]
 def is_std(object_val):
     name = object_val.lower()
     for i in standardlst:
-        if name in i:
+        if i in name:
             return True
     return False
 
 def gen_biaslst():
     fitname = os.listdir(os.getcwd() + os.sep + 'bias')
-    fitname = [i for i in fitname if i[-5:] == '.fits']
+    fitname = [i for i in fitname if os.path.isfile(os.getcwd() + os.sep + \
+            'bias' + os.sep + i) and i[0:2] == 'YF' and i[-5:] == '.fits']
     if len(fitname) > 0:
         path = os.getcwd()
         path = path + os.sep + 'bias' + os.sep
         f = open(path + 'spec_bias.lst', 'w')
         for i in fitname:
-            print(i + ' === > spec_bias.lst')
+            print(i + ' ---> spec_bias.lst')
             f.write( i + '\n')
         f.close()
     else:
@@ -40,10 +41,11 @@ def gen_biaslst():
 def gen_otherlst(path):
     fitname = os.listdir(path)
     fitname = [i for i in fitname if i[-5:] == '.fits' and i[0:2] == 'YF']
-    f = open('all.lst','w')
-    for i in fitname:
-        f.write(i + '\n')
-    f.close()
+    if len(fitname) > 0:
+        f = open(path + 'all.lst','w')
+        for i in fitname:
+            f.write(i + '\n')
+        f.close()
     halogen = []
     cor_halogen = []
     lamp = []
@@ -51,49 +53,55 @@ def gen_otherlst(path):
     std = []
     cor_std = []
     for i in fitname:
-        fit = pyfits.open(i)
+        fit = pyfits.open(path + i)
         name = fit[0].header['object'].lower()
         if 'halogen' in name:
+            print(i + ' : ' + name + ' ---> halogen.lst')
             halogen.append(i)
         else:
+            print(i + ' : ' + name + ' ---> cor_halogen.lst')
             cor_halogen.append(i)
             if fit[0].header['CLAMP2'] == 1 or fit[0].header['CLAMP3'] == 1 \
-                    fit[0].header['CLAMP4'] == 1:
+                    or fit[0].header['CLAMP4'] == 1:
+                print(i + ' : ' + name + ' ---> lamp.lst')
                 lamp.append(i)
             else:
+                print(i + ' : ' + name + ' ---> cor_lamp.lst')
                 cor_lamp.append(i)
-                if is_std(i):
+                if is_std(name):
+                    print(i + ' : ' + name + ' ---> std.lst')
                     std.append(i)
                 else:
+                    print(i + ' : ' + name + ' ---> cor_std.lst')
                     cor_std.append(i)
         fit.close()
+    if len(halogen) > 0:
+        f = open(path + 'halogen.lst','w')
+        for name in halogen:
+            f.write(name + '\n')
+        f.close()
+    if len(cor_halogen) > 0:
+        f = open(path + 'cor_halogen.lst','w')
+        for name in cor_halogen:
+            f.write(name + '\n')
+        f.close()
+    if len(lamp) > 0:
+        f = open(path + 'lamp.lst','w')
+        for name in lamp:
+            f.write(name + '\n')
+        f.close()
+    if len(cor_lamp) > 0:
+        f = open(path + 'cor_lamp.lst','w')
+        for name in cor_lamp:
+            f.write(name + '\n')
+        f.close()
+    if len(std) > 0:
+        f = open(path + 'std.lst','w')
+        for name in std:
+            f.write(name + '\n')
+        f.close()
     if len(cor_std) > 0:
-        if len(halogen) > 0:
-            f = open('halogen.lst','w')
-            for name in halogen:
-                f.write(name + '\n')
-            f.close()
-        if len(cor_halogen) > 0:
-            f = open('cor_halogen.lst','w')
-            for name in cor_halogen:
-                f.write(name + '\n')
-            f.close()
-        if len(lamp) > 0:
-            f = open('lamp.lst','w')
-            for name in lamp:
-                f.write(name + '\n')
-            f.close()
-        if len(cor_lamp) > 0:
-            f = open('cor_lamp.lst','w')
-            for name in cor_lamp:
-                f.write(name + '\n')
-            f.close()
-        if len(std) > 0:
-            f = open('std.lst','w')
-            for name in std:
-                f.write(name + '\n')
-            f.close()
-        f = open('cor_std.lst','w')
+        f = open(path + 'cor_std.lst','w')
         for name in cor_std:
             f.write(name + '\n')
         f.close()
@@ -107,3 +115,6 @@ def main():
             and 'other' not in i]
     for i in dirname:
         gen_otherlst(path + os.sep + i + os.sep)
+
+if __name__ == '__main__':
+    main()
