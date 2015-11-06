@@ -189,6 +189,8 @@ def standard(lstfile):
                 , interact = True, graphics = 'stdgraph', cursor = ''
                 , star_name = stdname, airmass = '', exptime = ''
                 , mag = stdmag, magband = stdmagband, teff = '', answer = 'yes')
+        iraf.sensfunc(standards = outname1, sensitivity = 'sens' + fitname, 
+            extinction = extpath, function = 'spline3', order = 9)
 def main():
     cor_airmass('cor_lamp.lst')
     standard('std.lst')
