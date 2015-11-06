@@ -11,6 +11,7 @@ import pyfits
 from pyraf import iraf
 
 stdlstname = 'std.lst'
+objradeclst = 'objradec.lst'
 
 def get_std_group(lstfile):
     f = open(lstfile)
@@ -49,9 +50,148 @@ def select_std(filename):
             name = i
     return name
     
+def get_radec_dict():
+    path = os.path.split(os.path.realpath(__file__))[0]
+    f = open(path + os.sep + objradeclst)
+    l = f.readlines()
+    f.close()
+    l = [tmp.split() for tmp in l]
+    return dict([[tmp[0],[tmp[1],tmp[2]]] for tmp in l])
+
+objradecdict = get_radec_dict()
+
+def findradec(name):
+    global objradecdict
+    while name not in objradecdict:
+        print('cann\'t find radec, please add objname ra dec to objradec.lst. The routine will try again.')
+        filepath = os.path.split(os.path.realpath(__file__))[0] + os.sep + objradeclst
+        os.system('gedit ' + filepath)
+        objradecdict = get_radec_dict()
+    return objradecdict[name]
+        
+def get_fit_normal_lst():
+    filepath = os.path.split(os.path.realpath(__file__))[0] + os.sep + 'objcheck.lst'
+    f = open(filepath)
+    l = f.readlines()
+    f.close()
+    l = [tmp.split() for tmp in l]
+    return dict(l)
+        
+obj_fit_normal_lst = get_fit_normal_lst()
+        
+def find_normal_objname(fitobjname):
+    global obj_fit_normal_lst
+    while fitobjname not in obj_fit_normal_lst:
+        print('=' * 20 + 'cann\'t find the real objname, please add objname a note to objcheck.lst. The routine will try again.')
+        filepath = os.path.split(os.path.realpath(__file__))[0] + os.sep + 'objcheck.lst'
+        os.system('gedit ' + filepath)
+        obj_fit_normal_lst = get_fit_normal_lst()
+    return obj_fit_normal_lst[fitobjname]
+
+def cor_airmass(lstfile):
+    f = open(lstfile)
+    l = f.readlines()
+    f.close()
+    l = [tmp.split('\n')[0] for tmp in l]
+    fitlst = ['awftbo' + tmp for tmp in l]
+    for fitname in fitlst:
+        if os.path.isfile(fitname):
+            fit = pyfits.open(fitname)
+            objname = fit[0].header['object'].replace('_', ' ').split()[0]
+            print(fitname + ' ' + objname)
+            objname_new = find_normal_objname(objname)
+            if len(objname_new) == 0:
+                objname_new = raw_input('please input object name:')
+            radec = findradec(objname_new)
+            if len(radec) == 0:
+                radec = raw_input('please input ra dec of objname:')
+                radec = radec.split()
+            fitextnum = len(fit)
+            fit.close()
+            for lay in range(fitextnum):
+                airold = iraf.hselect(images = fitname + '[%i]' % lay, fields = 'airmass', expr = 'yes', Stdout = 1)
+                airold = float(airold[0])
+                print(fitname + ' ' + objname + ' ' + str(lay) + ' airmass old: ' + str(airold))
+                fitnamelay = fitname + '[%i]' % lay
+                iraf.hedit(images = fitnamelay, fields = 'airold', 
+                    value = airold, add = 'yes', addonly = 'yes', delete = 'no', 
+                    verify = 'no', show = 'yes', update = 'yes')
+                iraf.hedit(images = fitnamelay, fields = 'sname', 
+                    value = objname, add = 'yes', addonly = 'yes', delete = 'no', 
+                    verify = 'no', show = 'yes', update = 'yes')
+                iraf.hedit(images = fitnamelay, fields = 'RA', 
+                    value = radec[0], add = 'yes', addonly = 'yes', delete = 'no', 
+                    verify = 'no', show = 'yes', update = 'yes')
+                iraf.hedit(images = fitnamelay, fields = 'DEC', 
+                    value = radec[1], add = 'yes', addonly = 'yes', delete = 'no', 
+                    verify = 'no', show = 'yes', update = 'yes')
+                iraf.twodspec()
+                stdpath = os.path.split(os.path.realpath(__file__))[0] + os.sep + 'standarddir' + os.sep
+                iraf.longslit(dispaxis = 2, nsum = 1, observatory = 'Lijiang', 
+                    extinction = 'onedstds$LJextinct.dat', caldir = stdpath)
+                iraf.setairmass(images = fitnamelay,
+                    observatory = 'Lijiang', intype = 'beginning', 
+                    outtype = 'effective', ra = 'ra', dec = 'dec', 
+                    equinox = 'epoch', st = 'lst', ut = 'date-obs', 
+                    date = 'date-obs', exposure = 'exptime', airmass = 'airmass', 
+                    utmiddle = 'utmiddle', scale = 750.0, show = 'yes', 
+                    override = 'yes', update = 'yes')
+                print('name airmass_new airmass_old')
+                iraf.hselect(fitnamelay, fields = '$I,airmass,airold', 
+                             expr = 'yes')
+    
+def get_std_name(objname):
+    scripath = os.path.split(os.path.realpath(__file__))[0]
+    f = open(scripath + os.sep + 'standard.lst')
+    name = f.readlines()
+    f.close()
+    stdnames = []
+    for i in name:
+        stdnames.append(i.split())
+    fitsname = objname.lower()
+    for i in stdnames:
+        if i[0] in fitsname:
+            return i[1], i[2], i[3]
+    print('can\'t find standard name %s %s' % fitsname)
+    os.system('gedit ' + scripath + os.sep + 'standard.lst' + ' &')
+    valget = raw_input('Please input the standard star name:')
+    valget = valget.lower()
+    for i in stdnames:
+        if i[0] in valget:
+            return i[1]
+    return []
+    
+def standard(lstfile):
+    stdpath = os.path.split(os.path.realpath(__file__))[0] + os.sep + 'standarddir' + os.sep
+    extpath = os.path.split(os.path.realpath(__file__))[0] + os.sep + 'LJextinct.dat'
+    iraf.noao()
+    iraf.twodspec()
+    iraf.longslit(dispaxis = 2, nsum = 1, observatory = 'Lijiang', 
+            extinction = extpath, caldir = stdpath)
+    f = open(lstfile)
+    lst = f.readlines()
+    f.close()
+    lst = [tmp.split('\n')[0] for tmp in lst]
+    fitlst = ['awftbo' + tmp for tmp in lst]
+    for fitname in fitlst:
+        fit = pyfits.open(fitname)
+        objname = fit[0].header['sname']
+        fit.close()
+        stdname, stdmag, stdmagband = get_std_name(objname)
+        print('the standard star is ' + stdname)
+        stdmag = float(stdmag)
+        outname1 = 'std' + fitname
+        iraf.standard(input = fitname
+                , output = outname1, samestar = True, beam_switch = False
+                , apertures = '', bandwidth = 30.0, bandsep = 20.0
+                , fnuzero = 3.6800000000000E-20, extinction = extpath
+                , caldir = stdpath, observatory = ')_.observatory'
+                , interact = True, graphics = 'stdgraph', cursor = ''
+                , star_name = stdname, airmass = '', exptime = ''
+                , mag = stdmag, magband = stdmagband, teff = '', answer = 'yes')
 def main():
-    get
-    pass
+    cor_airmass('cor_lamp.lst')
+    standard('std.lst')
 
 if __name__ == '__main__':
     main()
