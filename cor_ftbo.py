@@ -76,6 +76,7 @@ def corhalogen(lstfile):
         , interactive = False, function = 'chebyshev', order = 1
         , sample = '*', naverage = 1, niterate = 1
         , low_reject = 3.0, high_reject = 3.0, grow = 1.0)
+    iraf.flpr()
 
 def clear():
     filename = os.listdir(os.getcwd())
