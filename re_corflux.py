@@ -35,8 +35,8 @@ def get_std_mjd(groupset):
         mjdlst[i] = fit[0].header['MJD']
     return mjdlst
     
-stdgroup = get_std_group(stdlstname)
-stdmjdlst = get_std_mjd(stdgroup)
+stdgroup = {}
+stdmjdlst = {}
 
 def select_std(filename):
     fit = pyfits.open(filename)
@@ -161,27 +161,23 @@ def get_std_name(objname):
             return i[1]
     return []
     
-def standard(lstfile):
+def standard():
     stdpath = os.path.split(os.path.realpath(__file__))[0] + os.sep + 'standarddir' + os.sep
     extpath = os.path.split(os.path.realpath(__file__))[0] + os.sep + 'LJextinct.dat'
     iraf.noao()
     iraf.twodspec()
     iraf.longslit(dispaxis = 2, nsum = 1, observatory = 'Lijiang', 
             extinction = extpath, caldir = stdpath)
-    f = open(lstfile)
-    lst = f.readlines()
-    f.close()
-    lst = [tmp.split('\n')[0] for tmp in lst]
-    fitlst = ['awftbo' + tmp for tmp in lst]
-    for fitname in fitlst:
-        fit = pyfits.open(fitname)
-        objname = fit[0].header['sname']
-        fit.close()
+    for objname in stdgroup:
         stdname, stdmag, stdmagband = get_std_name(objname)
         print('the standard star is ' + stdname)
         stdmag = float(stdmag)
-        outname1 = 'std' + fitname
-        iraf.standard(input = fitname
+        outname1 = 'stdawftbo' + stdgroup[objname][0]
+        inname   = ''
+        for tmpname in stdgroup[objname]:
+            inname = inname + 'awftbo' + tmpname + ','
+        inname = inname[0:-1]
+        iraf.standard(input = inname
                 , output = outname1, samestar = True, beam_switch = False
                 , apertures = '', bandwidth = 30.0, bandsep = 20.0
                 , fnuzero = 3.6800000000000E-20, extinction = extpath
@@ -189,11 +185,48 @@ def standard(lstfile):
                 , interact = True, graphics = 'stdgraph', cursor = ''
                 , star_name = stdname, airmass = '', exptime = ''
                 , mag = stdmag, magband = stdmagband, teff = '', answer = 'yes')
-        iraf.sensfunc(standards = outname1, sensitivity = 'sens' + fitname, 
+    for name in stdgroup:
+        inpar = 'stdawftbo' + stdgroup[name][0]
+        iraf.sensfunc(standards = inpar, sensitivity = 'sensawftbo' + stdgroup[name][0], 
             extinction = extpath, function = 'spline3', order = 9)
+            
+def calibrate(lstfile):
+    stdpath = os.path.split(os.path.realpath(__file__))[0] + os.sep + 'standarddir' + os.sep
+    extpath = os.path.split(os.path.realpath(__file__))[0] + os.sep + 'LJextinct.dat'
+    iraf.noao()
+    iraf.twodspec()
+    iraf.longslit(dispaxis = 2, nsum = 1, observatory = 'Lijiang', 
+        extinction = extpath, caldir = stdpath)
+    f = open(lstfile)
+    l = f.readlines()
+    f.close()
+    l = [tmp.split('\n')[0] for tmp in l]
+    for fitname in l:
+        stdobjname = select_std(fitname)
+        stdfitname = 'sensawftbo' + stdgroup[stdobjname][0]
+        iraf.calibrate(input = 'awftbo'+ fitname, output = 'mark_awftbo' + fitname, 
+            extinct = 'yes', flux = 'yes', extinction = extpath, 
+            ignoreaps = 'yes', sensitivity = stdfitname, fnu = 'no')
+        iraf.splot(images = 'mark_awftbo' + fitname)
+            
+def clear():
+    filename = os.listdir(os.getcwd())
+    filename = [tmp for tmp in filename if os.path.isfile(tmp) and \
+        ( tmp[0:10] == 'sensawftbo' or tmp[0:9] == 'stdawftbo' or tmp[0:11] \
+        == 'mark_awftbo')]
+    for i in filename:
+        print('remove ' + i)
+        os.remove(i)
+        
 def main():
+    global stdgroup
+    global stdmjdlst
+    clear()
+    stdgroup = get_std_group(stdlstname)
+    stdmjdlst = get_std_mjd(stdgroup)
     cor_airmass('cor_lamp.lst')
-    standard('std.lst')
+    standard()
+    calibrate('cor_std.lst')
 
 if __name__ == '__main__':
     main()

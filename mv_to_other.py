@@ -49,7 +49,7 @@ def main():
                         break
                 if FLAG == True:
                     realobj_lst.append(object_val)
-        if len(realobj_lst) == 0:
+        if len(realobj_lst) == 0 or 'open' in i.lower():
             print('mv ' + i + ' other/')
             #os.system('mv ' + i + ' other/')
             shutil.move(i, os.getcwd() + os.sep + 'other' + os.sep + i)

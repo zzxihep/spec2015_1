@@ -24,7 +24,10 @@ def is_std(object_val):
     return False
 
 def gen_biaslst():
-    fitname = os.listdir(os.getcwd() + os.sep + 'bias')
+    biaspath = os.getcwd() + os.sep + 'bias'
+    fitname = []
+    if os.path.isdir(biaspath):
+        fitname = os.listdir(biaspath)
     fitname = [i for i in fitname if os.path.isfile(os.getcwd() + os.sep + \
             'bias' + os.sep + i) and i[0:2] == 'YF' and i[-5:] == '.fits']
     if len(fitname) > 0:
@@ -39,7 +42,9 @@ def gen_biaslst():
         print('no bias found')
 
 def gen_otherlst(path):
-    fitname = os.listdir(path)
+    fitname = []
+    if os.path.isdir(path):
+        fitname = os.listdir(path)
     fitname = [i for i in fitname if i[-5:] == '.fits' and i[0:2] == 'YF']
     if len(fitname) > 0:
         f = open(path + 'all.lst','w')

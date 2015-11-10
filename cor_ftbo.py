@@ -5,6 +5,7 @@ from pyraf import iraf
 
 def get_trim_sec():
     path = os.path.split(os.path.realpath(__file__))[0]
+    print('the script path is ' + path)
     f = open(path + os.sep + 'trim.lst')
     l = f.readlines()
     f.close()
@@ -21,10 +22,23 @@ def coroverbiastrim(lstfile):
     iraf.ccdred()
     x1,x2,y1,y2 = get_trim_sec()
     iraf.ccdproc(images = '@' + lstfile + '//[1]'
+        , output = '%bo%bo%@' + lstfile
+        , ccdtype = '', max_cache = 0, noproc = False
+        , fixpix = False, overscan = True, trim = False
+        , zerocor = True, darkcor = False, flatcor = False
+        , illumcor = False, fringecor = False, readcor = False
+        , scancor = False, readaxis = 'line', fixfile = ''
+        , biassec = '[5:45,%s:%s]'%(y1,y2), trimsec = '[%s:%s,%s:%s]'%(x1,x2,y1,y2)
+        , zero = 'Zero', dark = '', flat = '', illum = '', fringe = ''
+        , minreplace = 1.0, scantype = 'shortscan', nscan = 1
+        , interactive = False, function = 'chebyshev', order = 1
+        , sample = '*', naverage = 1, niterate = 1
+        , low_reject = 3.0, high_reject = 3.0, grow = 1.0)
+    iraf.ccdproc(images = '%bo%bo%@' + lstfile
         , output = '%tbo%tbo%@' + lstfile
         , ccdtype = '', max_cache = 0, noproc = False
-        , fixpix = False, overscan = True, trim = True
-        , zerocor = True, darkcor = False, flatcor = False
+        , fixpix = False, overscan = False, trim = True
+        , zerocor = False, darkcor = False, flatcor = False
         , illumcor = False, fringecor = False, readcor = False
         , scancor = False, readaxis = 'line', fixfile = ''
         , biassec = '[5:45,%s:%s]'%(y1,y2), trimsec = '[%s:%s,%s:%s]'%(x1,x2,y1,y2)
@@ -82,7 +96,7 @@ def clear():
     filename = os.listdir(os.getcwd())
     filename = [tmp for tmp in filename if os.path.isfile(tmp) and \
             (tmp[0:5] == 'tboYF' or tmp[0:6] == 'ftboYF' or tmp == 'Halogen.fits' \
-            or tmp == 'Resp.fits')]
+            or tmp == 'Resp.fits' or tmp[0:4] == 'boYF')]
     for i in filename:
         print('remove ' + i)
         os.remove(i)
