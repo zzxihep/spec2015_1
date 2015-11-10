@@ -6,9 +6,12 @@ import matplotlib.pyplot as plt
 
 def sspecplot(filename):
 	fit = pyfits.open(filename)
+        ape = 0
+        if 'APNUM1' in fit[0].header:
+            ape = int(fit[0].header['APNUM1'].split()[0]) - 1
 	num = fit[0].data.shape[1]
-	y = fit[0].data[0][0] + 2500
-	y2= fit[0].data[1][0]
+	y = fit[0].data[0][ape] + 2500
+	y2= fit[0].data[1][ape]
 	length = len(y)
 	begin = fit[0].header['CRVAL1']
 	step  = fit[0].header['CD1_1']
