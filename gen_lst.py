@@ -31,6 +31,7 @@ def gen_biaslst():
     fitname = [i for i in fitname if os.path.isfile(os.getcwd() + os.sep + \
             'bias' + os.sep + i) and i[0:2] == 'YF' and i[-5:] == '.fits']
     if len(fitname) > 0:
+        fitname.sort()
         path = os.getcwd()
         path = path + os.sep + 'bias' + os.sep
         f = open(path + 'spec_bias.lst', 'w')
@@ -81,31 +82,37 @@ def gen_otherlst(path):
                     cor_std.append(i)
         fit.close()
     if len(halogen) > 0:
+        halogen.sort()
         f = open(path + 'halogen.lst','w')
         for name in halogen:
             f.write(name + '\n')
         f.close()
     if len(cor_halogen) > 0:
+        cor_halogen.sort()
         f = open(path + 'cor_halogen.lst','w')
         for name in cor_halogen:
             f.write(name + '\n')
         f.close()
     if len(lamp) > 0:
+        lamp.sort()
         f = open(path + 'lamp.lst','w')
         for name in lamp:
             f.write(name + '\n')
         f.close()
     if len(cor_lamp) > 0:
+        cor_lamp.sort()
         f = open(path + 'cor_lamp.lst','w')
         for name in cor_lamp:
             f.write(name + '\n')
         f.close()
     if len(std) > 0:
+        std.sort()
         f = open(path + 'std.lst','w')
         for name in std:
             f.write(name + '\n')
         f.close()
     if len(cor_std) > 0:
+        cor_std.sort()
         f = open(path + 'cor_std.lst','w')
         for name in cor_std:
             f.write(name + '\n')

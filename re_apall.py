@@ -29,8 +29,6 @@ def apall(lstfile):
             if os.path.isfile(delfile):
                 print('remove ' + delfile)
                 os.remove(delfile)
-            else:
-                print('not find ' + delfile)
             iraf.apall(input = infile
                 , output = outfile, apertures = 2, format = 'multispec'
                 , references = '', profiles = '', interactive = True
