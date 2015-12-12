@@ -29,7 +29,7 @@ def check_bias():
         colmax   = coldata.max()
         colmin   = coldata.min()
         flag = True
-        if mean < 20120-30 or mean > 20120+30:
+        if mean < 20120-40 or mean > 20120+40:
             print('mean of %s = %.2f out of range(20090 - 20150)' % (i, mean))
             flag = False
         if std > 50:
