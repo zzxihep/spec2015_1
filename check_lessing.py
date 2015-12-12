@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-import os,shutil
-import pyfits
+import os, shutil
 import gen_lst
 
 def find_lst(dirname,filename):

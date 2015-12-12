@@ -117,7 +117,7 @@ def cor_airmass(lstfile):
                     value = airold, add = 'yes', addonly = 'yes', delete = 'no', 
                     verify = 'no', show = 'yes', update = 'yes')
                 iraf.hedit(images = fitnamelay, fields = 'sname', 
-                    value = objname, add = 'yes', addonly = 'yes', delete = 'no', 
+                    value = objname_new, add = 'yes', addonly = 'yes', delete = 'no', 
                     verify = 'no', show = 'yes', update = 'yes')
                 iraf.hedit(images = fitnamelay, fields = 'RA', 
                     value = radec[0], add = 'yes', addonly = 'yes', delete = 'no', 
@@ -163,6 +163,7 @@ def get_std_name(objname):
     
 def standard():
     stdpath = os.path.split(os.path.realpath(__file__))[0] + os.sep + 'standarddir' + os.sep
+    print('standard dir is ' + stdpath)
     extpath = os.path.split(os.path.realpath(__file__))[0] + os.sep + 'LJextinct.dat'
     iraf.noao()
     iraf.twodspec()

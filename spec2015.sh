@@ -8,5 +8,5 @@ ${0%/*}/check_lessing.py
 ${0%/*}/check_bad.py
 ${0%/*}/check_manual.py
 ${0%/*}/gen_zero.py
-${0%/*}/re.py
+${0%/*}/re_all.py
 cd ..

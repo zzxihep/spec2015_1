@@ -1,8 +1,10 @@
 #! /usr/bin/env python
 
 import os
+import pyfits
+#import numpy as np
 from pyraf import iraf
-
+#import matplotlib.pyplot as plt
 def check_bias():
     biaspath = os.getcwd() + os.sep + 'bias'
     if os.path.isfile(biaspath + os.sep + 'spec_bias.lst'):
@@ -29,6 +31,25 @@ def check_other(path):
     else:
         print('no dir ' + path + ' in ' + os.getcwd())
 
+#def check_out_val(path):
+#    if os.path.isdir(path):
+#        os.chdir(path)
+#        if os.path.isfile('cor_lamp.lst'):
+#            l = [i for i in file('cor_lamp.lst')]
+#            num = len(l)
+#            os.system('gedit cor_lamp.lst &')
+#            for fitname in l:
+#                fit = pyfits.open(fitname)
+#                fitdata = fit[1].data
+#                fitdata = fitdata * 2.0
+#                fitdata[np.where(fitdata < 560000.0)] = 0.0
+#                plt.imshow(fitdata)
+#                plt.colorbar()
+#                plt.title(fitname + ' ' + fit[0].header['object'])
+#                plt.show()
+#        os.chdir(os.path.split(os.getcwd())[0])
+
+
 def main():
     path = os.getcwd()
     print('check bias')
@@ -39,6 +60,7 @@ def main():
     for i in dirname:
         print(i)
         check_other(i)
+#        check_out_val(i)
 
 if __name__ == '__main__':
     main()
