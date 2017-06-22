@@ -49,7 +49,7 @@ def check_other(dirname):
     lstname = os.listdir(os.getcwd() + os.sep + dirname)
     lstname = [i for i in lstname if i[-4:] == '.lst']
     stdlstname = ['halogen.lst', 'lamp.lst', 'std.lst']
-    ret = True
+    ret = False
     for i in stdlstname:
         if i not in lstname:
             lstpath = find_lst(dirname, i)
@@ -58,18 +58,17 @@ def check_other(dirname):
                 os._exit(1)
             else:
                 copy_lst_and_fit(lstpath, os.getcwd() + os.sep + dirname + os.sep)
-                ret = False
+                ret = True
     return ret
 
 def main():
     check_bias()
     dirname = os.listdir(os.getcwd())
     dirname = [i for i in dirname if os.path.isdir(i) and 'bias' not in i and 'other' not in i]
-    flag = True
     for i in dirname:
-        flag = flag and check_other(i)
-    if flag == False:
-        gen_lst.main()
+        flag = check_other(i)
+        if flag:
+            gen_lst.main()
 
 if __name__ == '__main__':
     main()
