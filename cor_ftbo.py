@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import os
+import pyfits
 from pyraf import iraf
 
 def get_trim_sec():
@@ -10,7 +11,17 @@ def get_trim_sec():
     l = f.readlines()
     f.close()
     l = [i.split() for i in l]
-    curdirname = os.path.split(os.getcwd())[1]
+    dirlst = os.listdir(os.getcwd())
+    fitname = ''
+    for name in dirlst:
+        if name[0:2] == 'YF' and name[-5:]=='.fits':
+            fit = pyfits.open(name)
+            if 'bias' not in fit[0].header['OBJECT'].lower():
+                fitname = name
+    fit = pyfits.open(fitname)
+    hdr = fit[0].header
+    curdirname = (hdr['YGRNM'] + '_' + hdr['YAPRTNM']).replace(' ', '_')
+    #curdirname = os.path.split(os.getcwd())[1]
     for i in l:
         if i[0] == curdirname:
             return (i[1],i[2],i[3],i[4])
@@ -69,7 +80,7 @@ def combine_flat(lstfile):
     iraf.response(calibration = 'Halogen'
     	, normalization = 'Halogen', response = 'Resp'
     	, interactive = True, threshold = 'INDEF', sample = '*'
-    	, naverage = 1, function = 'spline3', order = 25
+    	, naverage = 1, function = 'spline3', order = 45
     	, low_reject = 10.0, high_reject = 10.0, niterate = 1
     	, grow = 0.0, graphics = 'stdgraph', cursor = '')
 
@@ -100,10 +111,16 @@ def clear():
     for i in filename:
         print('remove ' + i)
         os.remove(i)
-    
+
+def add_DISPAXIS(filelst):
+    iraf.hedit(images = '@'+filelst+'[1]', fields='DISPAXIS'
+            , value = '2', add='Yes', verify='No', show='Yes'
+            , update='Yes')
+
 def main():
     clear()
     print('='*20 + ' correct trim bias overscan ' + '='*20)
+    #add_DISPAXIS('all.lst')
     coroverbiastrim('all.lst')
     print('='*20 + ' correct flat ' + '='*20)
     combine_flat('halogen.lst')

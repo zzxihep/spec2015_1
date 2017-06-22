@@ -20,7 +20,7 @@ def get_std_group(lstfile):
     l = [tmp.split('\n')[0] for tmp in l]
     group = {}
     for i in l:
-        fit = pyfits.open(i)
+        fit = pyfits.open('awftbo'+i)
         name = fit[0].header['object']
         if name in group:
             group[name].append(i)
@@ -31,7 +31,7 @@ def get_std_group(lstfile):
 def get_std_mjd(groupset):
     mjdlst = {}
     for i in groupset:
-        fit = pyfits.open(groupset[i][0])
+        fit = pyfits.open('awftbo'+groupset[i][0])
         mjdlst[i] = fit[0].header['MJD']
     return mjdlst
     
@@ -136,6 +136,10 @@ def cor_airmass(lstfile):
                     date = 'date-obs', exposure = 'exptime', airmass = 'airmass', 
                     utmiddle = 'utmiddle', scale = 750.0, show = 'yes', 
                     override = 'yes', update = 'yes')
+                #iraf.hedit(images = fitnamelay, fields = 'AIRMASS',
+                #     value = '1', add = 'yes', addonly = 'yes', delete = 'no',
+                #     verify = 'no', show = 'yes', update = 'yes')
+
                 print('name airmass_new airmass_old')
                 iraf.hselect(fitnamelay, fields = '$I,airmass,airold', 
                              expr = 'yes')
@@ -152,7 +156,7 @@ def get_std_name(objname):
     for i in stdnames:
         if i[0] in fitsname:
             return i[1], i[2], i[3]
-    print('can\'t find standard name %s %s' % fitsname)
+    print('can\'t find standard name %s' % fitsname)
     os.system('gedit ' + scripath + os.sep + 'standard.lst' + ' &')
     valget = raw_input('Please input the standard star name:')
     valget = valget.lower()
@@ -160,7 +164,53 @@ def get_std_name(objname):
         if i[0] in valget:
             return i[1]
     return []
-    
+
+#def standard():
+#    f = open('std.lst')
+#    l = f.readlines()
+#    f.close()
+#    namelst = [i.split('\n')[0] for i in l]
+#    temp = ''
+#    for i in namelst:
+#        temp = temp + 'awftbo'+ i + ','
+#    temp = temp[0: -1]
+#    stdpath = os.path.split(os.path.realpath(__file__))[0] + os.sep + 'standarddir' + os.sep
+#    extpath = os.path.split(os.path.realpath(__file__))[0] + os.sep + 'LJextinct.dat'
+#
+##    for i in xrange(len(namelst)):
+##        iraf.hselect(images = namelst[i], fields = '$I,object', expr = 'yes')
+##    standname = raw_input('please input standard star name:')
+##    print 'standard star name:', standname
+#    iraf.twodspec()
+#    iraf.longslit(dispaxis = 2, nsum = 1, observatory = 'Lijiang', 
+#            extinction = extpath, caldir = stdpath)
+#    for i in xrange(len(namelst)):
+#        print '+' * 10, namelst[i]
+#        iraf.hselect(images = 'awftbo'+namelst[i], fields = '$I,object', expr = 'yes')
+#        standname = raw_input('please input standard star name:')
+#        print 'standard star name:', standname
+#        #iraf.standard(input = namelst[i], output = namelst[i].split('.')[0] + '.std', 
+#        #        samestar = 'yes', interact = 'yes', star_name = standname, airmass = '', 
+#        #        exptime = '', extinction = 'onedstds$LJextinct.dat', 
+#        #        caldir = 'onedstds$ctiocal/')
+#        iraf.standard(input = 'awftbo'+namelst[i], output = 'Std', 
+#                samestar = 'yes', interact = 'yes', star_name = standname, airmass = '', 
+#                exptime = '', extinction = extpath, 
+#                caldir = stdpath)
+#
+#    iraf.twodspec()
+#    iraf.longslit(dispaxis = 2, nsum = 1, observatory = 'Lijiang', 
+#        extinction = extpath, caldir = stdpath)
+#    iraf.sensfunc(standards = 'Std', sensitivity = 'Sens', 
+#        extinction = extpath, function = 'spline3', order = 9)
+#    iraf.splot('Sens')
+#
+##    iraf.standard(input = temp, output = 'std', 
+##            samestar = 'yes', interact = 'yes', star_name = standname, airmass = '', 
+##            exptime = '', extinction = 'onedstds$LJextinct.dat', 
+##            caldir = 'onedstds$ctiocal/')
+
+
 def standard():
     stdpath = os.path.split(os.path.realpath(__file__))[0] + os.sep + 'standarddir' + os.sep
     print('standard dir is ' + stdpath)
@@ -178,18 +228,21 @@ def standard():
         for tmpname in stdgroup[objname]:
             inname = inname + 'awftbo' + tmpname + ','
         inname = inname[0:-1]
-        iraf.standard(input = inname
-                , output = outname1, samestar = True, beam_switch = False
-                , apertures = '', bandwidth = 30.0, bandsep = 20.0
+        for tmpname in stdgroup[objname]:
+            #            iraf.standard(input = 'awftbo'+tmpname
+            iraf.standard(input = inname
+                , output = 'Std', samestar = True, beam_switch = False
+                , apertures = '', bandwidth = 'INDEF', bandsep = 'INDEF'# 30.0  20.0
                 , fnuzero = 3.6800000000000E-20, extinction = extpath
-                , caldir = stdpath, observatory = ')_.observatory'
+                , caldir = stdpath, observatory = 'Lijiang'
                 , interact = True, graphics = 'stdgraph', cursor = ''
                 , star_name = stdname, airmass = '', exptime = ''
                 , mag = stdmag, magband = stdmagband, teff = '', answer = 'yes')
-    for name in stdgroup:
-        inpar = 'stdawftbo' + stdgroup[name][0]
-        iraf.sensfunc(standards = inpar, sensitivity = 'sensawftbo' + stdgroup[name][0], 
-            extinction = extpath, function = 'spline3', order = 9)
+             #    for name in stdgroup:
+        #inpar = 'stdawftbo' + stdgroup[name][0]
+    iraf.sensfunc(standards = 'Std', sensitivity = 'Sens', 
+        extinction = extpath, function = 'spline3', order = 9)
+    iraf.splot('Sens')
             
 def calibrate(lstfile):
     stdpath = os.path.split(os.path.realpath(__file__))[0] + os.sep + 'standarddir' + os.sep
@@ -204,7 +257,8 @@ def calibrate(lstfile):
     l = [tmp.split('\n')[0] for tmp in l]
     for fitname in l:
         stdobjname = select_std(fitname)
-        stdfitname = 'sensawftbo' + stdgroup[stdobjname][0]
+   #     stdfitname = 'sensawftbo' + stdgroup[stdobjname][0]
+        stdfitname = 'Sens'
         iraf.calibrate(input = 'awftbo'+ fitname, output = 'mark_awftbo' + fitname, 
             extinct = 'yes', flux = 'yes', extinction = extpath, 
             ignoreaps = 'yes', sensitivity = stdfitname, fnu = 'no')
@@ -218,6 +272,10 @@ def clear():
     for i in filename:
         print('remove ' + i)
         os.remove(i)
+    if os.path.isfile('Sens.fits'):
+        os.remove('Sens.fits')
+    if os.path.isfile('Std'):
+        os.remove('Std')
         
 def main():
     global stdgroup

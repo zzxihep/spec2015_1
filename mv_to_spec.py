@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import re
 import os
 import shutil
 import pyfits
@@ -7,7 +8,7 @@ import pyfits
 def main():
     os.mkdir('spec')
     ifitsname = os.listdir(os.getcwd())
-    fitsnames = [i for i in ifitsname if os.path.isfile(i) and i[-5:] == '.fits']
+    fitsnames = [i for i in ifitsname if os.path.isfile(i) and re.match("^Y[A-Z].+[a-l][\d]{6}\\.fits$", i) != None]
     for i in fitsnames:
         fits = pyfits.open(i)
         hdr = fits[1].header

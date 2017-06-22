@@ -29,16 +29,12 @@ def main():
         #fitsnames = [ii.split('\n')[0] for ii in ifitsname]
         fitsnames = [ii for ii in ifitsname if os.path.isfile(os.getcwd() + os.sep + i + os.sep \
                 + ii) and ii[0:2] == 'YF' and ii[-5:] == '.fits']
-        objects = []
         realobj_lst = []
         for j in fitsnames:
             fits = pyfits.open(i + os.sep + j)
             object_val = fits[0].header['object'].lower()
             lamp_flag = fits[0].header['CLAMP2'] == 1 or fits[0].header['CLAMP3'] == 1 \
-                or fits[0].header['CLAMP4'] == 1
-            #objects.append(fits[0].header['object'].lower())
-            #fits.close()
-        #for j in objects:
+                or fits[0].header['CLAMP4'] == 1 or fits[0].header['CLAMP1'] == 1
             if 'bias' not in object_val and 'halogen' not in object_val and 'neon' not in \
                     object_val and 'helium' not in object_val and 'fear' not in object_val \
                     and not lamp_flag:

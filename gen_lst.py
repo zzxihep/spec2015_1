@@ -47,6 +47,12 @@ def gen_otherlst(path):
     if os.path.isdir(path):
         fitname = os.listdir(path)
     fitname = [i for i in fitname if i[-5:] == '.fits' and i[0:2] == 'YF']
+    nfitname = []
+    for name in  fitname:
+        fit = pyfits.open(path+os.sep+name)
+        if 'bia' not in fit[0].header['OBJECT'].lower():
+            nfitname.append(name)
+    fitname = nfitname
     if len(fitname) > 0:
         f = open(path + 'all.lst','w')
         for i in fitname:
@@ -61,7 +67,9 @@ def gen_otherlst(path):
     for i in fitname:
         fit = pyfits.open(path + i)
         name = fit[0].header['object'].lower()
-        if 'halogen' in name:
+#        if fit[0].header['CLAMP1'] == 1:
+        if 'halogen' in fit[0].header['OBJECT'].lower() or 'haolgen' in fit[0].header['OBJECT'].lower() or 'halgen'  in fit[0].header['OBJECT'].lower(): #tmp change, the fits file header is wrong in someday
+
             print(i + ' : ' + name + ' ---> halogen.lst')
             halogen.append(i)
         else:
