@@ -1,7 +1,9 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import os, shutil
 import gen_lst
+import glob
 
 def find_lst(dirname,filename):
     path = os.getcwd()
@@ -43,11 +45,10 @@ def check_bias():
             print('cann\'t find spec_bias.lst')
             os._exit(1)
         else:
-            copy_lst_and_fit(lstpath, os.getcwd() + os.sep + 'bias/')
+            copy_lst_and_fit(lstpath, os.getcwd() + os.sep + 'bias' + os.sep)
 
 def check_other(dirname):
-    lstname = os.listdir(os.getcwd() + os.sep + dirname)
-    lstname = [i for i in lstname if i[-4:] == '.lst']
+    lstname = glob.glob(os.getcwd() + os.sep + dirname + os.sep + '*.lst')
     stdlstname = ['halogen.lst', 'lamp.lst', 'std.lst']
     ret = False
     for i in stdlstname:
