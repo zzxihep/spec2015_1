@@ -19,6 +19,16 @@ def icontinuum(fn):
         ask = 'Yes')
     return 'c'+fn # return out fit name
 
+def scombine(fstr, oname):
+    iraf.scombine(input=fstr, output=oname, noutput = '', logfile='STDOUT', \
+        apertures = '', group = 'apertures', combine = 'sum', reject = 'none',\
+        first = 'No', w1 = 'INDEF', w2 = 'INDEF', dw = 'INDEF', nw = 'INDEF', \
+        log = 'No', scale = 'none', zero = 'none', weight = 'none', \
+        sample = '', lthreshold = 'INDEF', lthreshold = 'INDEF', nlow = 1, \
+        nhigh = 1, nkeep = 1, mclip = 'Yes', lsigma = 3.0, hsigma = 3.0, \
+        rdnoise = 'RDNOISE', gain = 'GAIN', snoise = 0.0, sigscale = 0.1, \
+        pclip = -0.5, grow = 0, blank = 1.0)
+
 def continuum(fn):
     windows = [[6800.0, 7110.0], [7110.0, 7470.0], [7500.0, 7800], [8000.0, 8480.0]]
     namelst = []
@@ -32,7 +42,7 @@ def continuum(fn):
     namestr = ''
     for name in cnamelst:
         namestr += name+','
-    namestr = namestr[:-1]
+    namestr = namestr[:]
 
 def scopy_cmp(fn, w1 = 'INDEF', w2 = 'INDEF'):
     nax2 = pyfits.getval(fn, keyword = 'NAXIS2')
