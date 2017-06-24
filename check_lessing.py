@@ -24,9 +24,7 @@ def find_lst(dirname,filename):
     return ''
 
 def copy_lst_and_fit(lst_path, topath):
-    f = open(lst_path)
-    l = f.readlines()
-    f.close()
+    l = open(lst_path).readlines()
     l = [i.split('\n')[0] for i in l]
     frompath, lstname = os.path.split(lst_path)
     print('copy ' + lstname + ' from ' + frompath + ' to ' + topath)
