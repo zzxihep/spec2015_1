@@ -5,8 +5,9 @@ import os
 import sys
 import glob
 import pyfits
-import func
 from pyraf import iraf
+import func
+import re_corflux
 
 
 def to_str(lst, sep=','):
@@ -27,14 +28,6 @@ def to_str(lst, sep=','):
     size = len(sep)
     ret = ret[:-size]
     return ret
-
-
-class abc(self):
-    def println(self):
-        print "Hello World"
-
-    def random(self):
-        pass
 
 
 def scopy_cmp(fn, w1='INDEF', w2='INDEF'):
@@ -141,7 +134,7 @@ def gen_cal(fn):
     return oname
 
 
-def telluric(iname, oname, cal):
+def telluric(iname, oname, cal, dscale=0.0):
     """
     call iraf command telluric.
     if output file already exist, this function will delete the old one.
@@ -158,7 +151,7 @@ def telluric(iname, oname, cal):
     iraf.telluric(input=iname, output=oname, cal=cal, ignoreaps='Yes',
                   xcorr='Yes', tweakrms='Yes', interactive='Yes', sample='*',
                   threshold=0.0, lag=10, shift=0.0, scale=1.0, dshift=1.0,
-                  dscale=0.2, offset=1.0, smooth=1, cursor='', airmass='',
+                  dscale=dscale, offset=1.0, smooth=1, cursor='', airmass='',
                   answer='yes')
 
 
@@ -194,6 +187,11 @@ def main():
     scombine(namestr, stdcalname, combine='average')
     for i, name in enumerate(objlst):
         telluric(name, 'telstd_'+name, stdcalname)
+    namelst = glob.glob('tel*.fits')
+    stdlst = [i for i in namelst if func.is_std(i)]
+    objlst = list(set(namelst) - set(stdlst))
+    re_corflux.standard(stdlst)
+    re_corflux.calibrate(objlst)
 
 
 if __name__ == '__main__':

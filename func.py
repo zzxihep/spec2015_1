@@ -6,6 +6,9 @@ from termcolor import colored
 from pyraf import iraf
 
 script_path = os.path.dirname(os.path.realpath(__file__))
+std_path = script_path + os.sep + 'standarddir'
+lijiang_extinction_file = script_path + os.sep + 'LJextinct.dat'
+
 
 def sname(fn):
     """
@@ -18,30 +21,37 @@ def sname(fn):
     namelst = open(script_path+os.sep+'objcheck.lst').readlines()
     namedic = dict([i.split() for i in namelst])
     objname = pyfits.getval(fn, 'OBJECT')
+    objname = objname.split('_')[0]
     if objname in namedic:
         return namedic[objname]
     else:
-        print(colored('can\'t match the object name %s\nPlease check and edit the match file.', 'yellow'))
+        print(colored(('can\'t match the object name %s.\nPlease check and '
+                       'edit the match file.') % objname, 'yellow'))
         webbrowser.open(script_path+os.sep+'objcheck.lst')
         raw_input('edit ok?(y)')
         sname(fn)
 
+
 def set_sname(fn):
     """
-    set a new keyword 'SNAME' to fits fn, the value is standard name of the source. the SNAME value depend on the 'OBJECT' keyword.
+    set a new keyword 'SNAME' to fits fn,
+    the value is standard name of the source.
+    the SNAME value depend on the 'OBJECT' keyword.
     fn : fits name
     type : string
     """
     standname = sname(fn)
     size = len(pyfits.open(fn))
     if size == 1:
-        iraf.hedit(images=fn, fields='SNAME', value=standname, add = 'Yes', \
-            addonly='No', delete='No', verify='No', show='Yes', update='Yes')
+        iraf.hedit(images=fn, fields='SNAME', value=standname, add='Yes',
+                   addonly='No', delete='No', verify='No', show='Yes',
+                   update='Yes')
     else:
         for i in range(len(size)):
-            iraf.hedit(images=fn+'[%d]'%i, fields='SNAME', value=standname, \
-                add = 'Yes', addonly='No', delete='No', verify='No', \
-                show='Yes', update='Yes')
+            iraf.hedit(images=fn+'[%d]' % i, fields='SNAME', value=standname,
+                       add='Yes', addonly='No', delete='No', verify='No',
+                       show='Yes', update='Yes')
+
 
 def copy_lstfile(lstfile, dst):
     """
@@ -60,6 +70,7 @@ def copy_lstfile(lstfile, dst):
         print("copy %s to %s" % (name, dst))
         shutil.copyfile(path+os.sep+name, dst=dst+os.sep)
 
+
 def get_ra_dec(fn):
     """
     get the source coords
@@ -75,10 +86,12 @@ def get_ra_dec(fn):
         ra, dec = radecdic[standname].split()
         return ra, dec
     else:
-        print(colored('can\'t match %s, please check and edit objradec.lst', 'yellow'))
+        print(colored('can\'t match %s, please check and edit objradec.lst',
+                      'yellow'))
         webbrowser.open(script_path+os.sep+'objradec.lst')
         raw_input('edit ok?(y)')
         get_ra_dec(fn)
+
 
 def set_ra_dec(fn, ra, dec):
     """
@@ -92,18 +105,19 @@ def set_ra_dec(fn, ra, dec):
     """
     size = len(pyfits.open(fn))
     if size == 1:
-        iraf.hedit(images=fn, fields='RA', value=ra, add = 'Yes', \
-            addonly='No', delete='No', verify='No', show='Yes', update='Yes')
-        iraf.hedit(images=fn, fields='DEC', value=dec, add = 'Yes', \
-            addonly='No', delete='No', verify='No', show='Yes', update='Yes')
+        iraf.hedit(images=fn, fields='RA', value=ra, add='Yes', addonly='No',
+                   delete='No', verify='No', show='Yes', update='Yes')
+        iraf.hedit(images=fn, fields='DEC', value=dec, add='Yes', addonly='No',
+                   delete='No', verify='No', show='Yes', update='Yes')
     else:
         for i in range(len(size)):
-            iraf.hedit(images=fn+'[%d]'%i, fields='RA', value=ra, \
-                add = 'Yes', addonly='No', delete='No', verify='No', \
-                show='Yes', update='Yes')
-            iraf.hedit(images=fn+'[%d]'%i, fields='DEC', value=dec, \
-                add = 'Yes', addonly='No', delete='No', verify='No', \
-                show='Yes', update='Yes')
+            iraf.hedit(images=fn+'[%d]' % i, fields='RA', value=ra, add='Yes',
+                       addonly='No', delete='No', verify='No', show='Yes',
+                       update='Yes')
+            iraf.hedit(images=fn+'[%d]' % i, fields='DEC', value=dec,
+                       add='Yes', addonly='No', delete='No', verify='No',
+                       show='Yes', update='Yes')
+
 
 def is_std(fn):
     """
@@ -124,6 +138,7 @@ def is_std(fn):
             return True
     return False
 
+
 def is_halogen(fn):
     """
     whether the fits fn is halogen flat, determined by keyword 'CLAMP1'
@@ -138,9 +153,11 @@ def is_halogen(fn):
     else:
         return True
 
+
 def is_lamp(fn):
     """
-    whether the fits fn is a wavelength calibrate file, determined by keyword 'CLAMP2', 'CLAMP3', 'CLAMP4'
+    whether the fits fn is a wavelength calibrate file, determined by keyword
+    'CLAMP2', 'CLAMP3', 'CLAMP4'
     'CLAMP2' : FeAr
     'CLAMP3' : Neon
     'CLAMP4' : Helium
@@ -156,6 +173,7 @@ def is_lamp(fn):
         return True
     else:
         return False
+
 
 def is_FeAr(fn):
     """
@@ -174,6 +192,7 @@ def is_FeAr(fn):
     else:
         return False
 
+
 def is_Neon(fn):
     """
     whether the Neon lamp light
@@ -190,6 +209,7 @@ def is_Neon(fn):
         return True
     else:
         return False
+
 
 def is_Helium(fn):
     """
@@ -208,6 +228,7 @@ def is_Helium(fn):
     else:
         return False
 
+
 def is_bias(fn):
     """
     whether the fits type is bias
@@ -222,3 +243,83 @@ def is_bias(fn):
         return True
     else:
         return False
+
+
+def set_airmass(fn):
+    """
+    Set airmass of fits fn. If keyword 'AIRMASS' already exist, the old airmass
+    value will saved by keyword 'AIROLD'. If keyword 'AIROLD' also exist, the
+    old airmass value will just overwritten. If the fits fn have more than one
+    hdu or more than one star, this function assume they have same ra, dec and
+    observed in same time.
+    fn : fits name
+    type : string
+    """
+    fit = pyfits.open(fn)
+    size = len(fit)
+    for i, hdu in enumerate(fit):
+        if 'AIRMASS' in hdu.header:
+            airmassold = hdu.header['AIRMASS']
+            print(colored('%s[%d] airmassold = %f' % (fn, i, airmassold),
+                          'blue'))
+            if 'AIROLD' in hdu.header:
+                airold = hdu.header['AIROLD']
+                print(colored('%s[%d] AIROLD = %f' % (fn, i, airold),
+                              'yellow'))
+                print(colored(('\'AIROLD\' keyword alreay exist, the airmass '
+                               'old will not saved'), 'yellow'))
+            else:
+                iraf.hedit(images=fn+'[%d]' % i, fields='AIROLD',
+                           value=airmassold, add='Yes', addonly='Yes',
+                           delete='No', verify='No', show='Yes', update='Yes')
+    fit.close()
+    ra, dec = get_ra_dec(fn)
+    set_ra_dec(fn, ra, dec)
+    iraf.twodspec()
+    stdpath = script_path + os.sep + 'standarddir' + os.sep
+    extfile = script_path + os.sep + 'LJextinct.dat'
+    iraf.longslit(dispaxis=2, nsum=1, observatory='Lijiang',
+                  extinction=extfile, caldir=stdpath)
+    for i in range(size):
+        iraf.setairmass(images=fn+'[%d]' % i, observatory='Lijiang',
+                        intype='beginning', outtype='effective', ra='ra',
+                        dec='dec', equinox='epoch', st='lst', ut='date-obs',
+                        date='date-obs', exposure='exptime', airmass='airmass',
+                        utmiddle='utmiddle', scale=750.0, show='yes',
+                        override='yes', update='yes')
+
+
+def standard_star_info(fn):
+    """
+    get standard star information.
+    fn : fits name
+    type : string
+    return : standard star name, magnitude, filter band
+    type : string, float, string
+    """
+    stdname = sname(fn)
+    stdlstname = script_path + os.sep + 'standard.lst'
+    lst = open(stdlstname).readlines()
+    lst = dict([i.split(None, 2)[1:] for i in lst])
+    mag, band = lst[stdname].split()
+    return stdname, float(mag), band
+
+
+def to_str(lst, sep=','):
+    """
+    convert string list to a sum string,
+    like lst = ['abc.fits', 'def.fits', 'ghi.fits'],
+    return 'abc.fits,def.fits,ghi.fits'
+    lst : string list
+    type : list
+    sep : separator, default ','
+    type : string
+    return : sum string
+    type : string
+    """
+    ret = ''
+    for string in lst:
+        ret += string + sep
+    size = len(sep)
+    ret = ret[:-size]
+    return ret
