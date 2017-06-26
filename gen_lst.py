@@ -1,140 +1,86 @@
 #!/usr/bin/env python
+# -*- encoding=utf-8 -*-
 
-import os,sys
+# @Author: zhixiang zhang <zzx>
+# @Date:   26-Jun-2017
+# @Email:  zhangzx@ihep.ac.cn
+# @Filename: gen_lst.py
+# @Last modified by:   zzx
+# @Last modified time: 27-Jun-2017
+
+import os
+import glob
 import pyfits
+from termcolor import colored
+import func
 
-def get_standard_lst():
-    dirname, filename = os.path.split(os.path.abspath(sys.argv[0]))
-    filename = dirname + os.sep + 'standard.lst'
-    f = open(filename)
-    l = f.readlines()
-    f.close()
-    l = [i.split('\n')[0] for i in l]
-    l = [i.split() for i in l]
-    return l
 
-standardlst = get_standard_lst()
-standardlst = [tmp[0] for tmp in standardlst]
-
-def is_std(object_val):
-    name = object_val.lower()
-    for i in standardlst:
-        if i in name:
-            return True
-    return False
-
-def gen_biaslst():
-    biaspath = os.getcwd() + os.sep + 'bias'
-    fitname = []
-    if os.path.isdir(biaspath):
-        fitname = os.listdir(biaspath)
-    fitname = [i for i in fitname if os.path.isfile(os.getcwd() + os.sep + \
-            'bias' + os.sep + i) and i[0:2] == 'YF' and i[-5:] == '.fits']
-    if len(fitname) > 0:
-        fitname.sort()
-        path = os.getcwd()
-        path = path + os.sep + 'bias' + os.sep
-        f = open(path + 'spec_bias.lst', 'w')
-        for i in fitname:
-            print(i + ' ---> spec_bias.lst')
-            f.write( i + '\n')
-        f.close()
+def gen_lst(namelst, ynfun, outname):
+    """
+    generate a lst file in current dir, the file name = outname.
+    If outname already exist, this function will delete the old.
+    namelst : fits name list, ['1.fits', '2.fits', '3.fits']
+    type : string list
+    ynfun : function to check filename in namelst, receive a string parameter,
+        return a boolean value. If value yes, the filename will be accepted.
+    type : function
+    return : accepted filename list
+    type : string list
+    """
+    if os.path.isfile(outname):
+        os.remove(outname)
+    newnamelst = []
+    for name in namelst:
+        if ynfun(name):
+            newnamelst.append(name)
+    if len(newnamelst) == 0:
+        print(colored('no file name write to '+outname, 'red'))
     else:
-        print('no bias found')
+        fil = open(outname, 'w')
+        for name in newnamelst:
+            objvalue = pyfits.getval(name, 'OBJECT')
+            print('%s  --->  %-16s  %s' % (name, outname, objvalue))
+            fil.write(name+'\n')
+        fil.close()
+    return newnamelst
 
-def gen_otherlst(path):
-    fitname = []
-    if os.path.isdir(path):
-        fitname = os.listdir(path)
-    fitname = [i for i in fitname if i[-5:] == '.fits' and i[0:2] == 'YF']
-    nfitname = []
-    for name in  fitname:
-        fit = pyfits.open(path+os.sep+name)
-        if 'bia' not in fit[0].header['OBJECT'].lower():
-            nfitname.append(name)
-    fitname = nfitname
-    if len(fitname) > 0:
-        f = open(path + 'all.lst','w')
-        for i in fitname:
-            f.write(i + '\n')
-        f.close()
-    halogen = []
-    cor_halogen = []
-    lamp = []
-    cor_lamp = []
-    std = []
-    cor_std = []
-    for i in fitname:
-        fit = pyfits.open(path + i)
-        name = fit[0].header['object'].lower()
-#        if fit[0].header['CLAMP1'] == 1:
-        if 'halogen' in fit[0].header['OBJECT'].lower() or 'haolgen' in fit[0].header['OBJECT'].lower() or 'halgen'  in fit[0].header['OBJECT'].lower(): #tmp change, the fits file header is wrong in someday
-
-            print(i + ' : ' + name + ' ---> halogen.lst')
-            halogen.append(i)
-        else:
-            print(i + ' : ' + name + ' ---> cor_halogen.lst')
-            cor_halogen.append(i)
-            if fit[0].header['CLAMP2'] == 1 or fit[0].header['CLAMP3'] == 1 \
-                    or fit[0].header['CLAMP4'] == 1:
-                print(i + ' : ' + name + ' ---> lamp.lst')
-                lamp.append(i)
-            else:
-                print(i + ' : ' + name + ' ---> cor_lamp.lst')
-                cor_lamp.append(i)
-                if is_std(name):
-                    print(i + ' : ' + name + ' ---> std.lst')
-                    std.append(i)
-                else:
-                    print(i + ' : ' + name + ' ---> cor_std.lst')
-                    cor_std.append(i)
-        fit.close()
-    if len(halogen) > 0:
-        halogen.sort()
-        f = open(path + 'halogen.lst','w')
-        for name in halogen:
-            f.write(name + '\n')
-        f.close()
-    if len(cor_halogen) > 0:
-        cor_halogen.sort()
-        f = open(path + 'cor_halogen.lst','w')
-        for name in cor_halogen:
-            f.write(name + '\n')
-        f.close()
-    if len(lamp) > 0:
-        lamp.sort()
-        f = open(path + 'lamp.lst','w')
-        for name in lamp:
-            f.write(name + '\n')
-        f.close()
-    if len(cor_lamp) > 0:
-        cor_lamp.sort()
-        f = open(path + 'cor_lamp.lst','w')
-        for name in cor_lamp:
-            f.write(name + '\n')
-        f.close()
-    if len(std) > 0:
-        std.sort()
-        f = open(path + 'std.lst','w')
-        for name in std:
-            f.write(name + '\n')
-        f.close()
-    if len(cor_std) > 0:
-        cor_std.sort()
-        f = open(path + 'cor_std.lst','w')
-        for name in cor_std:
-            f.write(name + '\n')
-        f.close()
-    
 
 def main():
-    gen_biaslst()
-    path = os.getcwd()
-    dirname = os.listdir(path)
-    dirname = [i for i in dirname if os.path.isdir(i) and 'bias' not in i \
-            and 'other' not in i]
-    for i in dirname:
-        gen_otherlst(path + os.sep + i + os.sep)
+    """
+    Assume current dir = spec/
+    """
+    if os.path.isdir('bias'):
+        print('cd bias/')
+        os.chdir('bias')
+        namelst = glob.glob('YF*.fits')
+        namelst.sort()
+        gen_lst(namelst=namelst, ynfun=func.is_bias, outname='spec_bias.fits')
+        print('cd ..')
+        os.chdir('..')
+    else:
+        print(colored('no bias dir found', 'red'))
+
+    dirlst = os.listdir('.')
+    dirlst = [i for i in dirlst if os.path.isdir(i) and
+              i != 'bias' and i != 'other']
+    for mdir in dirlst:
+        print('cd '+mdir)
+        os.chdir(mdir)
+        namelst = glob.glob('YF*.fits')
+        namelst.sort()
+        gen_lst(namelst, lambda x: True, outname='all.lst')
+        halogen_lst = gen_lst(namelst, func.is_halogen, 'halogen.lst')
+        namelst = list(set(namelst)-set(halogen_lst))
+        gen_lst(namelst, lambda x: not func.is_halogen(x), 'cor_halogen.lst')
+        lamplst = gen_lst(namelst, func.is_lamp, 'lamp.lst')
+        namelst = list(set(namelst)-set(lamplst))
+        gen_lst(namelst, lambda x: not func.is_lamp(x), 'cor_lamp.lst')
+        standlst = gen_lst(namelst, func.is_std, 'std.lst')
+        namelst = list(set(namelst)-set(standlst))
+        gen_lst(namelst, lambda x: not func.is_std(x), 'obj.lst')
+        print('cd ..')
+        os.chdir('..')
+
 
 if __name__ == '__main__':
     main()
