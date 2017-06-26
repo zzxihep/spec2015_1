@@ -3,7 +3,7 @@
 # @Email:  zhangzx@ihep.ac.cn
 # @Filename: func.py
 # @Last modified by:   zzx
-# @Last modified time: 26-Jun-2017
+# @Last modified time: 27-Jun-2017
 
 
 import os
@@ -253,6 +253,22 @@ def is_bias(fn):
         return False
 
 
+def is_spec(fn):
+    """
+    whether the fits type is spec.
+    determined by file size.
+    fn : fits name
+    type : string
+    return :
+    type : boolean
+    """
+    if fn[-5:] == '.fits':
+        size = os.path.getsize(fn)
+        if size == 39646080:
+            return True
+    return False
+
+
 def set_airmass(fn):
     """
     Set airmass of fits fn. If keyword 'AIRMASS' already exist, the old airmass
@@ -302,7 +318,7 @@ def standard_star_info(fn):
     get standard star information.
     fn : fits name
     type : string
-    return : standard star name, magnitude, filter band
+    return : standard star name, magnitude, mag band
     type : string, float, string
     """
     stdname = sname(fn)
@@ -331,3 +347,31 @@ def to_str(lst, sep=','):
     size = len(sep)
     ret = ret[:-size]
     return ret
+
+
+def get_grism(fn):
+    """
+    get grism value, the grism keyword = 'YGRNM'.
+    blank char will be replaced by '_'.
+    fn : fits name
+    type : string
+    return : grism name
+    type : string
+    """
+    name = pyfits.getval(fn, 'YGRNM')
+    name = name.replace(' ', '_')
+    return name
+
+
+def get_slit(fn):
+    """
+    get slit value, the slit keyword = 'YAPRTNM'.
+    blank char will replaced by '_'.
+    fn : fits name
+    type : string
+    return : slit name
+    type : string
+    """
+    name = pyfits.getval(fn, 'YAPRTNM')
+    name = name.replace(' ', '_')
+    return name
