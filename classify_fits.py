@@ -1,33 +1,35 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-import os,shutil
-import pyfits
+"""
+separate fits file by whether type bias, and grism, slit.
+"""
+
+import os
+import glob
+import shutil
+import func
+
 
 def main():
-    #ifitsname = os.popen('ls *.fits').readlines()
-    ifitsname = os.listdir(os.getcwd())
-    #fitsnames = [ i.split('\n')[0] for i in ifitsname ]
-    fitsnames = [i for i in ifitsname if os.path.isfile(i) and i[-5:] == '.fits']
-    dirnames  = {'bias':[]}
-    for i in fitsnames:
-        fits = pyfits.open(i)
-        hdr  = fits[0].header
-        if 'bias' in hdr['object'].lower():
-            dirnames['bias'].append(i)
+    """
+    Assume current dir = spec/
+    separate fits file by type bias, grism, slit.
+    """
+    namelst = glob.glob('Y*.fits')
+    if not os.path.isdir('bias'):
+        os.mkdir('bias')
+    for name in namelst:
+        if func.is_bias(name):
+            print 'mv %s bias/' % name
+            shutil.move(name, 'bias'+os.sep+name)
         else:
-            dirname = (hdr['YGRNM'] + '_' + hdr['YAPRTNM']).replace(' ', '_')
-            if dirnames.has_key(dirname):
-                dirnames[dirname].append(i)
-            else:
-                dirnames[dirname] = [i]
-    for i in dirnames:
-        print ('mkdir ' + i)
-	#os.system("mkdir " + i)
-        os.mkdir(i)
-        for name in dirnames[i]:
-            print ('mv ' + name + ' ' + i)
-            #os.system('mv ' + name + ' ' + i + '/')
-            shutil.move(name, os.getcwd() + os.sep + i + os.sep + name)
+            dirname = func.get_grism(name)+'_'+func.get_slit(name)
+            if not os.path.isdir(dirname):
+                os.mkdir(dirname)
+            print 'mv %s %s' % (name, dirname)
+            shutil.move(name, dirname+os.sep+name)
+
 
 if __name__ == '__main__':
     main()

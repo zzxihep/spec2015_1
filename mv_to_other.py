@@ -1,58 +1,52 @@
 #!/usr/bin/env python
 
-import os,sys,shutil
-import pyfits
+"""
+mv useless dir to other/ dir
+"""
+import os
+import glob
+import shutil
+import func
 
-def get_standard_lst():
-    dirname, filename = os.path.split(os.path.abspath(sys.argv[0]))
-    filename = dirname + os.sep + 'standard.lst'
-    f = open(filename)
-    l = f.readlines()
-    f.close()
-    l = [i.split('\n')[0] for i in l]
-    l = [i.split() for i in l]
-    return l
+
+def has_obj(namelst):
+    """
+    To find if there are obj fits in namelst.
+    If any obj fits, return True, else return False.
+    namelst : fits name list, ['1.fits', '2.fits', '3.fits']
+    type : string list
+    return : True or False
+    type : boolean
+    """
+    for name in namelst:
+        if func.is_bias(name) or func.is_halogen(name) or \
+           func.is_lamp(name) or func.is_std(name):
+            pass
+        else:
+            return True
+    return False
+
 
 def main():
-    #dirnames = os.popen("ls").readlines()
-    dirnames = os.listdir(os.getcwd())
-    #dirnames = [ i.split('\n')[0] for i in dirnames ]
-    dirnames = [ i for i in dirnames if os.path.isdir(i) and 'bias' not in i and 'other' not in i]
-    standard = get_standard_lst()
-    standard = [i[0] for i in standard]
-    print('mkdir other')
-    #os.system('mkdir other')
-    os.mkdir('other')
-    for i in dirnames:
-        #ifitsname = os.popen('ls ' + i).readlines()
-        ifitsname = os.listdir(os.getcwd() + os.sep + i)
-        #fitsnames = [ii.split('\n')[0] for ii in ifitsname]
-        fitsnames = [ii for ii in ifitsname if os.path.isfile(os.getcwd() + os.sep + i + os.sep \
-                + ii) and ii[0:2] == 'YF' and ii[-5:] == '.fits']
-        realobj_lst = []
-        for j in fitsnames:
-            fits = pyfits.open(i + os.sep + j)
-            object_val = fits[0].header['object'].lower()
-            lamp_flag = fits[0].header['CLAMP2'] == 1 or fits[0].header['CLAMP3'] == 1 \
-                or fits[0].header['CLAMP4'] == 1 or fits[0].header['CLAMP1'] == 1
-            if 'bias' not in object_val and 'halogen' not in object_val and 'neon' not in \
-                    object_val and 'helium' not in object_val and 'fear' not in object_val \
-                    and not lamp_flag:
-                FLAG = True
-                for k in standard:
-                    if k in object_val:
-                        FLAG = False
-                        break
-                if FLAG == True:
-                    realobj_lst.append(object_val)
-        if len(realobj_lst) == 0 or 'open' in i.lower():
-            print('mv ' + i + ' other/')
-            #os.system('mv ' + i + ' other/')
-            shutil.move(i, os.getcwd() + os.sep + 'other' + os.sep + i)
-        else:
-            print(i + ' not move')
-            for obj in realobj_lst:
-                print(obj + ' is real object')
+    """
+    Assume current dir = spec/
+    mv useless dir(no obj fits) to other/
+    """
+    odirname = 'other'
+    dirlst = os.listdir('.')
+    dirlst = [i for i in dirlst if os.path.isdir(i) and
+              i != 'bias' and i != odirname]
+    if not os.path.isdir(odirname):
+        os.mkdir('other')
+    for dirname in dirlst:
+        os.chdir(dirname)
+        namelst = glob.glob('Y*.fits')
+        hasobj = has_obj(namelst)
+        os.chdir('..')
+        if not hasobj:
+            print 'mv %s %s%s' % (dirname, odirname, os.sep)
+            shutil.move(dirname, 'other'+os.sep+dirname)
+
 
 if __name__ == '__main__':
     main()

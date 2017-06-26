@@ -8,6 +8,19 @@
 # @Last modified by:   zzx
 # @Last modified time: 27-Jun-2017
 
+"""
+Generate lst file for different fits type.
+the lst file include :
+    spec_bias.lst
+    all.lst
+    halogen.lst
+    cor_halogen.lst
+    lamp.lst
+    cor_lamp.lst
+    std.lst
+    cor_std.lst
+"""
+
 import os
 import glob
 import pyfits
@@ -33,13 +46,13 @@ def gen_lst(namelst, ynfun, outname):
     for name in namelst:
         if ynfun(name):
             newnamelst.append(name)
-    if len(newnamelst) == 0:
-        print(colored('no file name write to '+outname, 'red'))
+    if newnamelst == []:
+        print colored('no file name write to '+outname, 'red')
     else:
         fil = open(outname, 'w')
         for name in newnamelst:
             objvalue = pyfits.getval(name, 'OBJECT')
-            print('%s  --->  %-16s  %s' % (name, outname, objvalue))
+            print '%s  --->  %-16s  %s' % (name, outname, objvalue)
             fil.write(name+'\n')
         fil.close()
     return newnamelst
@@ -50,21 +63,21 @@ def main():
     Assume current dir = spec/
     """
     if os.path.isdir('bias'):
-        print('cd bias/')
+        print 'cd bias/'
         os.chdir('bias')
         namelst = glob.glob('YF*.fits')
         namelst.sort()
-        gen_lst(namelst=namelst, ynfun=func.is_bias, outname='spec_bias.fits')
-        print('cd ..')
+        gen_lst(namelst=namelst, ynfun=func.is_bias, outname='spec_bias.lst')
+        print 'cd ..'
         os.chdir('..')
     else:
-        print(colored('no bias dir found', 'red'))
+        print colored('no bias dir found', 'red')
 
     dirlst = os.listdir('.')
     dirlst = [i for i in dirlst if os.path.isdir(i) and
               i != 'bias' and i != 'other']
     for mdir in dirlst:
-        print('cd '+mdir)
+        print 'cd '+mdir
         os.chdir(mdir)
         namelst = glob.glob('YF*.fits')
         namelst.sort()
@@ -78,7 +91,7 @@ def main():
         standlst = gen_lst(namelst, func.is_std, 'std.lst')
         namelst = list(set(namelst)-set(standlst))
         gen_lst(namelst, lambda x: not func.is_std(x), 'obj.lst')
-        print('cd ..')
+        print 'cd ..'
         os.chdir('..')
 
 
