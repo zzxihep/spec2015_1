@@ -1,3 +1,11 @@
+# @Author: zhixiang zhang <zzx>
+# @Date:   26-Jun-2017
+# @Email:  zhangzx@ihep.ac.cn
+# @Filename: func.py
+# @Last modified by:   zzx
+# @Last modified time: 26-Jun-2017
+
+
 import os
 import pyfits
 import shutil

@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # coding=utf8
 
+# @Author: zhixiang zhang <zzx>
+# @Date:   26-Jun-2017
+# @Email:  zhangzx@ihep.ac.cn
+# @Filename: cor_telluric.py
+# @Last modified by:   zzx
+# @Last modified time: 26-Jun-2017
+
+
 import os
 import sys
 import glob
@@ -46,9 +54,9 @@ def scopy_cmp(fn, w1='INDEF', w2='INDEF'):
     type : string
     """
     nax2 = pyfits.getval(fn, keyword='NAXIS2')
-    outname = str(w1)+'_'+str(w2)+'_'+fn
+    outname = str(w1) + '_' + str(w2) + '_' + fn
     if os.path.isfile(outname):
-        print('remove file '+outname)
+        print('remove file ' + outname)
         os.remove(outname)
     iraf.scopy(input=fn, output=outname, w1=w1, w2=w2, apertures=nax2,
                bands=1, beams='', apmodulus=0, format='multispec',
@@ -66,9 +74,9 @@ def icontinuum(fn):
     return : out put file name
     type : string
     """
-    outname = 'c'+fn
+    outname = 'c' + fn
     if os.path.isfile(outname):
-        print('remove file '+outname)
+        print('remove file ' + outname)
         os.remove(outname)
     iraf.continuum(input=fn, output=outname, lines='*', bands=1, type='ratio',
                    replace='no', wavescale='Yes', logscale='No', override='No',
@@ -92,7 +100,7 @@ def scombine(fstr, oname, combine='sum'):
     type : string
     """
     if os.path.isfile(oname):
-        print('remove file '+oname)
+        print('remove file ' + oname)
         os.remove(oname)
     iraf.scombine(input=fstr, output=oname, noutput='', logfile='STDOUT',
                   apertures='', group='apertures', combine=combine,
@@ -119,7 +127,7 @@ def gen_cal(fn):
                [8000.0, 8480.0]]
     oname = 'cont_' + fn
     if os.path.isfile(oname):
-        print('remove file '+oname)
+        print('remove file ' + oname)
         os.remove(oname)
     namelst = []
     for window in windows:
@@ -146,7 +154,7 @@ def telluric(iname, oname, cal, dscale=0.0):
     type : string
     """
     if os.path.isfile(oname):
-        print('remove file '+oname)
+        print('remove file ' + oname)
         os.remove(oname)
     iraf.telluric(input=iname, output=oname, cal=cal, ignoreaps='Yes',
                   xcorr='Yes', tweakrms='Yes', interactive='Yes', sample='*',
@@ -179,14 +187,14 @@ def main():
         calname = gen_cal(name)
         calobjlst.append(calname)
     for i, name in enumerate(calstdlst):
-        telluric(stdlst[i], 'telself_'+stdlst[i], name)
+        telluric(stdlst[i], 'telself_' + stdlst[i], name)
     for i, name in enumerate(calobjlst):
-        telluric(objlst[i], 'telself_'+objlst[i], name)
+        telluric(objlst[i], 'telself_' + objlst[i], name)
     stdcalname = 'stdcalaver.fits'
     namestr = to_str(calstdlst)
     scombine(namestr, stdcalname, combine='average')
     for i, name in enumerate(objlst):
-        telluric(name, 'telstd_'+name, stdcalname)
+        telluric(name, 'telstd_' + name, stdcalname)
     namelst = glob.glob('tel*.fits')
     stdlst = [i for i in namelst if func.is_std(i)]
     objlst = list(set(namelst) - set(stdlst))
