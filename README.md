@@ -27,17 +27,18 @@
   3. 手动检查bias、halogen、lamp、standard、obj，如有问题，从lst文件中删除
 
 #### 4. 进入不同目录，正式处理
+---
 
 ### 文件名规范
 处理中产生的新文件通过在前面加更多字符来标识。如:
 mark_awftbo*.fits
 * mark_ 最终的光谱，经过流量定标
-* a (apall)经过抽谱，对应couts谱
-* w (wavelength)，经过波长定标
-* f (flat)，经过平场改正
-* t (trim)，经过裁剪
-* b (bias)，经过减bias
-* o (overscan)，经过overscan
+* a (apall) 经过抽谱，对应couts谱
+* w (wavelength) 经过波长定标
+* f (flat) 经过平场改正
+* t (trim) 经过裁剪
+* b (bias) 经过减bias
+* o (overscan) 经过overscan
 
 其他文件有:
 * Zero.fits : 合并后的bias
