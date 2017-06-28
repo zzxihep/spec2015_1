@@ -6,10 +6,10 @@
 std和sens分别是经过standard和sensfunc命令处理后加的标识，只对标准星进行
 mark_开头表示最终抽出来的谱
 ### 处理流程
-* [分类](分类)
-* [生成lst文件](genlst)
-* [检查](check)
-* [分别进入不同目录，正式处理](proc)
+* [分类](#分类)
+* [生成lst文件](#genlst)
+* [检查](#check)
+* [分别进入不同目录，正式处理](#proc)
 
 
 1. <span id="分类">分类</span>
