@@ -6,17 +6,19 @@
 std和sens分别是经过standard和sensfunc命令处理后加的标识，只对标准星进行
 mark_开头表示最终抽出来的谱
 ### 处理流程
-* [分类](#分类)
-* [生成lst文件](#genlst)
-* [检查](#检查)
-* [分别进入不同目录，正式处理](#proc)
+* [分类](#1.)
+* [生成lst文件](#2.)
+* [检查](#3.)
+* [分别进入不同目录，正式处理](#3.)
 
 
-1. 分类
-    1. 将所有的光谱文件移动到一个目录，这里设置该目录名为spec
-    2. 根据不同文件名光栅狭缝把fits文件移动到不同目录，目录命名规则Grismname'+"\_"+Slitname，如Grism_8_Slit0.5, Grism_10_Slit5.05，其中bias文件专门建立目录bias
-    3. 没有source数据，只有公共数据的目录，移动到other目录
-2. 生成lst文件，分别进入不同目录，生成不同种类fits的lst文件，这些lst文件包括：
+#### 1. 分类
+  1. 将所有的光谱文件移动到一个目录，这里设置该目录名为spec
+  2. 根据不同文件名光栅狭缝把fits文件移动到不同目录，目录命名规则Grismname'+"\_"+Slitname，如Grism_8_Slit0.5, Grism_10_Slit5.05，其中bias文件专门建立目录bias
+  3. 没有source数据，只有公共数据的目录，移动到other目录
+
+#### 2. 生成lst文件
+分别进入不同目录，生成不同种类fits的lst文件，这些lst文件包括：
     * bias.lst
     * halogen.lst
     * cor_halogen.lst
@@ -24,8 +26,10 @@ mark_开头表示最终抽出来的谱
     * cor_lamp.lst
     * std.lst
     * cor_std.lst
-3. 检查
-    1. 检查公共文件、standard star文件是否有缺失。若缺失，从临近天拷贝相应数据，重新生成lst文件
-    2. 自动检查bias，halogen等文件
-    3. 手动检查bias、halogen、lamp、standard、obj，如果有问题，从lst文件中删除
-4. 进入不同目录，正式处理
+
+#### 3. 检查
+  1. 检查公共文件、standard star文件是否有缺失。若缺失，从临近天拷贝相应数据，重新生成lst文件
+  2. 自动检查bias，halogen等文件
+  3. 手动检查bias、halogen、lamp、standard、obj，如果有问题，从lst文件中删除
+
+#### 4. 进入不同目录，正式处理
