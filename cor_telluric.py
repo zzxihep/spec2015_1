@@ -6,12 +6,13 @@
 # @Email:  zhangzx@ihep.ac.cn
 # @Filename: cor_telluric.py
 # @Last modified by:   zzx
-# @Last modified time: 26-Jun-2017
+# @Last modified time: 28-Jun-2017
 
 
 import os
 import sys
 import glob
+import shutil
 import pyfits
 from pyraf import iraf
 import func
@@ -165,14 +166,18 @@ def telluric(iname, oname, cal, dscale=0.0):
 
 def main():
     """
+    Assume current dir = Grism_x_Slit_x
     main function
     """
-    # stdlst = open('std.lst').readlines()
-    # stdlst = ['awftbo'+i.strip() for i in stdlst]
-    # for name in stdlst:
-    #     print name
-    # objlst = open('cor_std.lst').readlines()
-    # objlst = ['awftbo'+i.strip() for i in objlst]
+    teldir = 'telluric'
+    if not os.path.isdir(teldir):
+        print 'mkdir ' + teldir
+        os.mkdir(teldir)
+    fitlst = glob.glob('awftbo*.fits')
+    for name in fitlst:
+        print 'copy %s %s%s' % (name, teldir, os.sep)
+        shutil.copyfile(name, teldir+os.sep+name)
+    os.chdir(teldir)
     namelst = glob.glob('awftbo*.fits')
     stdlst = [i for i in namelst if func.is_std(i)]
     objlst = list(set(namelst) - set(stdlst))
@@ -200,6 +205,7 @@ def main():
     objlst = list(set(namelst) - set(stdlst))
     re_corflux.standard(stdlst)
     re_corflux.calibrate(objlst)
+    os.chdir('..')
 
 
 if __name__ == '__main__':
