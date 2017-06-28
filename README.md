@@ -6,11 +6,10 @@
 std和sens分别是经过standard和sensfunc命令处理后加的标识，只对标准星进行
 mark_开头表示最终抽出来的谱
 ### 处理流程
-* [分类](#1.)
-* [生成lst文件](#2.)
-* [检查](#3.)
-* [分别进入不同目录，正式处理](#3.)
-
+* [分类](#1-分类)
+* [生成lst文件](#2-生成lst文件)
+* [检查](#3-检查)
+* [分别进入不同目录，正式处理](#4-进入不同目录，正式处理)
 
 #### 1. 分类
   1. 将所有的光谱文件移动到一个目录，这里设置该目录名为spec
@@ -19,13 +18,13 @@ mark_开头表示最终抽出来的谱
 
 #### 2. 生成lst文件
 分别进入不同目录，生成不同种类fits的lst文件，这些lst文件包括：
-    * bias.lst
-    * halogen.lst
-    * cor_halogen.lst
-    * lamp.lst
-    * cor_lamp.lst
-    * std.lst
-    * cor_std.lst
+  * bias.lst
+  * halogen.lst
+  * cor_halogen.lst
+  * lamp.lst
+  * cor_lamp.lst
+  * std.lst
+  * cor_std.lst
 
 #### 3. 检查
   1. 检查公共文件、standard star文件是否有缺失。若缺失，从临近天拷贝相应数据，重新生成lst文件
