@@ -5,7 +5,7 @@
 之后的 awftbo 中aw分别代表w(wavelength)波长定标，a(apall)抽谱，以awftbo开头的文件是已经做完波长定标并抽出来的谱
 std和sens分别是经过standard和sensfunc命令处理后加的标识，只对标准星进行
 mark_开头表示最终抽出来的谱
-### 处理流程
+### 流程
 * [分类](#1-分类)
 * [生成lst文件](#2-生成lst文件)
 * [检查](#3-检查)
