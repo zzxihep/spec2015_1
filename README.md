@@ -1,10 +1,5 @@
 # spec2015_1
-***
-处理中产生的新文件通过在前面加更多字符来标识
-其中 ftbo 分别代表: flat修正,trim,bias修正,overscan
-之后的 awftbo 中aw分别代表w(wavelength)波长定标，a(apall)抽谱，以awftbo开头的文件是已经做完波长定标并抽出来的谱
-std和sens分别是经过standard和sensfunc命令处理后加的标识，只对标准星进行
-mark_开头表示最终抽出来的谱
+
 ### 流程
 * [分类](#1-分类)
 * [生成lst文件](#2-生成lst文件)
@@ -32,3 +27,22 @@ mark_开头表示最终抽出来的谱
   3. 手动检查bias、halogen、lamp、standard、obj，如有问题，从lst文件中删除
 
 #### 4. 进入不同目录，正式处理
+
+### 文件名规范
+处理中产生的新文件通过在前面加更多字符来标识。如:
+mark_awftbo*.fits
+* mark_ 最终的光谱，经过流量定标
+* a (apall)经过抽谱，对应couts谱
+* w (wavelength)，经过波长定标
+* f (flat)，经过平场改正
+* t (trim)，经过裁剪
+* b (bias)，经过减bias
+* o (overscan)，经过overscan
+
+其他文件有:
+* Zero.fits : 合并后的bias
+* Halogen.fits : 合并后的平场文件
+* Resp.fits : 经过改正后的平场文件
+* Lamp.fits : 合并后的定标灯谱文件
+* Std : 标准星光谱生成的文件
+* Sens.fits : 由标准星光谱生成的响应曲线文件
