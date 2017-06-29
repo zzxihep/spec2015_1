@@ -3,7 +3,7 @@
 # @Email:  zhangzx@ihep.ac.cn
 # @Filename: func.py
 # @Last modified by:   zzx
-# @Last modified time: 27-Jun-2017
+# @Last modified time: 29-Jun-2017
 
 
 import os
@@ -37,7 +37,7 @@ def sname(fn):
                        'edit the match file.') % objname, 'yellow'))
         webbrowser.open(script_path+os.sep+'objcheck.lst')
         raw_input('edit ok?(y)')
-        sname(fn)
+        return sname(fn)
 
 
 def set_sname(fn):
@@ -94,11 +94,11 @@ def get_ra_dec(fn):
         ra, dec = radecdic[standname].split()
         return ra, dec
     else:
-        print(colored('can\'t match %s, please check and edit objradec.lst',
-                      'yellow'))
+        print(colored('can\'t match %s, please check and edit objradec.lst'
+                      % standname, 'yellow'))
         webbrowser.open(script_path+os.sep+'objradec.lst')
         raw_input('edit ok?(y)')
-        get_ra_dec(fn)
+        return get_ra_dec(fn)
 
 
 def set_ra_dec(fn, ra, dec):

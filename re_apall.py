@@ -9,7 +9,7 @@ import os
 import pyfits
 from pyraf import iraf
 import sspecplot
-import re_corflux
+import func
 
 def read_conf():
     path = os.path.split(os.path.realpath(__file__))[0]
@@ -36,9 +36,8 @@ def apall(lstfile):
         raper = 15.0
         back_samp = '-50:-26,26:50'
         fit = pyfits.open(infile)
-        objname = fit[0].header['OBJECT'].strip().split()[0].split('_')[0]
-        print('obj name = '+objname)
-        sname = re_corflux.find_normal_objname(objname)
+        sname = func.sname(infile)
+        print('obj name = '+sname)
         fit.close()
         if sname in confdic:
             laper = confdic[sname][0]
