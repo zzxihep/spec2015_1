@@ -6,7 +6,7 @@
 # @Email:  zhangzx@ihep.ac.cn
 # @Filename: gen_lst.py
 # @Last modified by:   zzx
-# @Last modified time: 27-Jun-2017
+# @Last modified time: 29-Jun-2017
 
 """
 Generate lst file for different fits type.
@@ -90,7 +90,7 @@ def main():
         gen_lst(namelst, lambda x: not func.is_lamp(x), 'cor_lamp.lst')
         standlst = gen_lst(namelst, func.is_std, 'std.lst')
         namelst = list(set(namelst)-set(standlst))
-        gen_lst(namelst, lambda x: not func.is_std(x), 'obj.lst')
+        gen_lst(namelst, lambda x: not func.is_std(x), 'cor_std.lst')
         print 'cd ..'
         os.chdir('..')
 

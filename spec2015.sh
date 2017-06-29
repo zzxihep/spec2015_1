@@ -1,4 +1,12 @@
-#! /bin/sh
+#! /bin/bash
+
+# @Author: zhixiang zhang <zzx>
+# @Date:   08-Jan-2017
+# @Email:  zhangzx@ihep.ac.cn
+# @Filename: spec2015.sh
+# @Last modified by:   zzx
+# @Last modified time: 29-Jun-2017
+
 ${0%/*}/mv_to_spec.py
 cd spec
 ${0%/*}/classify_fits.py
@@ -8,5 +16,17 @@ ${0%/*}/check_lessing.py
 ${0%/*}/check_bad.py
 ${0%/*}/check_manual.py
 ${0%/*}/gen_zero.py
-${0%/*}/re_all.py
+for dirname in `ls`; do
+  if [ -d $dirname ] && [ $dirname != bias ] && [ $dirname != other ]; then
+    cd $dirname
+    echo current dir `pwd`
+    ${0%/*}/cor_ftbo_2017.py
+    ${0%/*}/sltcomblamp.py
+    ${0%/*}/sltwcalib2d.py
+    ${0%/*}/check_wcal2d.py
+    ${0%/*}/re_apall.py
+    ${0%/*}/re_corflux.py
+    cd ..
+  fi
+done
 cd ..
