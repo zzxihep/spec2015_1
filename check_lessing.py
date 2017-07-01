@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# @Author: zhixiang zhang <zzx>
+# @Date:   27-Jun-2017
+# @Email:  zhangzx@ihep.ac.cn
+# @Filename: check_lessing.py
+# @Last modified by:   zzx
+# @Last modified time: 02-Jul-2017
+
 """
 check the missing files.
 if some file missing, we can\'t complete the whole process.
@@ -9,6 +16,7 @@ data from other dir.
 """
 
 import os
+from termcolor import colored
 import gen_lst
 import func
 
@@ -29,9 +37,10 @@ def find_lst(lfname):
     specdir = os.path.basename(curdir)  # should spec
     abstoday_dir = os.path.dirname(curdir)  # should **/20xxxxxx
     today_dir = os.path.basename(abstoday_dir)  # should 20xxxxxx
-    root_dir = os.path.dirname(today_dir)  # should **/
+    root_dir = os.path.dirname(abstoday_dir)  # should **/
+    print root_dir
     oday_dirlst = os.listdir(root_dir)
-    oday_dirlst = [i for i in oday_dirlst if os.path.isdir(i)]
+    oday_dirlst = [i for i in oday_dirlst if os.path.isdir(root_dir+os.sep+i)]
     oday_dirlst.sort(key=lambda x: abs(int(today_dir)-int(x)))
     # sort date dir, key is abs diff to current date dir
     for dirname in oday_dirlst:
@@ -50,9 +59,10 @@ def main():
         lamp.lst
         std.lst
     """
+    print '-'*10+'check lessing'+'-'*10
     lflst = ['halogen.lst', 'lamp.lst', 'std.lst']
     curdir = os.getcwd()
-    print 'current dir = ' + curdir
+    print colored('current dir = ' + curdir, 'green')
 
     if not os.path.isdir('bias'):
         print 'mkdir bias'
@@ -69,6 +79,7 @@ def main():
         for lstname in lflst:
             dirlstname = dirname+os.sep+lstname
             if not os.path.isfile(dirlstname):
+                print colored('not found file '+dirlstname, 'yellow')
                 pathname = find_lst(dirlstname)
                 func.copy_lstfile(pathname, dirname)
     gen_lst.main()

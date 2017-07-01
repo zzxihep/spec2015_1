@@ -3,7 +3,7 @@
 # @Email:  zhangzx@ihep.ac.cn
 # @Filename: func.py
 # @Last modified by:   zzx
-# @Last modified time: 29-Jun-2017
+# @Last modified time: 02-Jul-2017
 
 
 import os
@@ -64,19 +64,19 @@ def set_sname(fn):
 def copy_lstfile(lstfile, dst):
     """
     copy lstfile to dst, and copy the files(name in lstfile) to dst
-    lstfile : the lst file name(include abs path)
+    lstfile : the lst file name(include abs path), like '/*/G4S5/abc.lst'
     type : string
-    dst : derectory path
+    dst : derectory path, like 'G4S5', '/*/G4S5', 'G4S5/'
     type : string
     """
     print("copy %s to %s" % (lstfile, dst))
-    shutil.copyfile(lstfile, dst=dst+os.sep)
+    shutil.copyfile(lstfile, dst=dst+os.sep+os.path.basename(lstfile))
     path = os.path.dirname(lstfile)
     namelst = open(lstfile).readlines()
     namelst = [i.strip() for i in namelst]
     for name in namelst:
         print("copy %s to %s" % (name, dst))
-        shutil.copyfile(path+os.sep+name, dst=dst+os.sep)
+        shutil.copyfile(path+os.sep+name, dst=dst+os.sep+name)
 
 
 def get_ra_dec(fn):

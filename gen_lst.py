@@ -6,7 +6,7 @@
 # @Email:  zhangzx@ihep.ac.cn
 # @Filename: gen_lst.py
 # @Last modified by:   zzx
-# @Last modified time: 30-Jun-2017
+# @Last modified time: 01-Jul-2017
 
 """
 Generate lst file for different fits type.
@@ -83,16 +83,13 @@ def main():
         namelst.sort()
         gen_lst(namelst, lambda x: True, outname='all.lst')
         halogen_lst = gen_lst(namelst, func.is_halogen, 'halogen.lst')
-        namelst = list(set(namelst)-set(halogen_lst))
-        namelst.sort()
+        namelst = sorted(list(set(namelst)-set(halogen_lst)))
         gen_lst(namelst, lambda x: not func.is_halogen(x), 'cor_halogen.lst')
         lamplst = gen_lst(namelst, func.is_lamp, 'lamp.lst')
-        namelst = list(set(namelst)-set(lamplst))
-        namelst.sort()
+        namelst = sorted(list(set(namelst)-set(lamplst)))
         gen_lst(namelst, lambda x: not func.is_lamp(x), 'cor_lamp.lst')
         standlst = gen_lst(namelst, func.is_std, 'std.lst')
-        namelst = list(set(namelst)-set(standlst))
-        namelst.sort()
+        namelst = sorted(list(set(namelst)-set(standlst)))
         gen_lst(namelst, lambda x: not func.is_std(x), 'cor_std.lst')
         print 'cd ..'
         os.chdir('..')
