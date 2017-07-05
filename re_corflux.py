@@ -9,7 +9,7 @@ Created on Thu Nov  5 22:08:34 2015
 import os
 import pyfits
 from pyraf import iraf
-from termcolor import colored
+from func import colored
 from func import script_path
 import func
 

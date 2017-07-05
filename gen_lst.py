@@ -6,7 +6,7 @@
 # @Email:  zhangzx@ihep.ac.cn
 # @Filename: gen_lst.py
 # @Last modified by:   zzx
-# @Last modified time: 01-Jul-2017
+# @Last modified time: 02-Jul-2017
 
 """
 Generate lst file for different fits type.
@@ -24,7 +24,7 @@ the lst file include :
 import os
 import glob
 import pyfits
-from termcolor import colored
+from func import colored
 import func
 
 

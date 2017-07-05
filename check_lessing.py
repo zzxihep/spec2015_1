@@ -16,7 +16,7 @@ data from other dir.
 """
 
 import os
-from termcolor import colored
+from func import colored
 import gen_lst
 import func
 

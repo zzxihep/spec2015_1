@@ -5,7 +5,7 @@
 # @Email:  zhangzx@ihep.ac.cn
 # @Filename: spec2015.sh
 # @Last modified by:   zzx
-# @Last modified time: 29-Jun-2017
+# @Last modified time: 02-Jul-2017
 
 ${0%/*}/mv_to_spec.py
 cd spec
