@@ -17,6 +17,12 @@ script_path = os.path.dirname(os.path.realpath(__file__))
 std_path = script_path + os.sep + 'standarddir'
 lijiang_extinction_file = script_path + os.sep + 'LJextinct.dat'
 
+try:
+    from termcolor import colored
+except ImportError:
+    def colored(string, color):
+        return string
+
 
 def sname(fn):
     """
