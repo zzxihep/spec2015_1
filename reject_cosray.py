@@ -1,6 +1,7 @@
 #!/usr/binenv python
 # -*- coding=utf-8 -*-
 
+import os
 from pyraf import iraf
 
 iraf.imred()
@@ -25,10 +26,14 @@ def crmedian(fn, oname):
 def main():
     """
     reject cosmic ray, after wavelength calibration here.
-    out file name add a char 'c', like cwftbo*.fits
+    out file name add a char 'c', like cwftbo*.fits.
+    But in order compatible with old naming notations,
+    we rename the file name.
     """
     filename = 'cor_lamp.lst'
     crmedian('wftbo@'+filename, 'cwftbo@'+filename)
+    os.sys('rename "s/wftbo/pcwftbo/" wftbo*.fits')
+    os.sys('rename "s/cwftbo/wftbo/" cwftbo*.fits')
 
 
 if __name__ == '__main__':

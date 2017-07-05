@@ -79,7 +79,7 @@ def main():
         for lstname in lflst:
             dirlstname = dirname+os.sep+lstname
             if not os.path.isfile(dirlstname):
-                print colored('not found file '+dirlstname, 'yellow')
+                print colored('not found file '+dirlstname, 'red')
                 pathname = find_lst(dirlstname)
                 func.copy_lstfile(pathname, dirname)
     gen_lst.main()
