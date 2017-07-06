@@ -6,6 +6,7 @@ mv useless dir to other/ dir
 import os
 import glob
 import shutil
+import pyfits
 import func
 
 
@@ -23,6 +24,9 @@ def has_obj(namelst):
            func.is_lamp(name) or func.is_std(name):
             pass
         else:
+            if func.get_grism(name).lower() == 'open' or \
+               func.get_slit(name).lower() == 'open':
+                return False
             return True
     return False
 
