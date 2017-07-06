@@ -1,4 +1,4 @@
-#!/usr/binenv python
+#!/usr/bin/env python
 # -*- coding=utf-8 -*-
 
 import os
@@ -17,10 +17,12 @@ def crmedian(fn, oname):
     oname : out put file name or file name list, like cabc.fits or
         cabc.fits,cabd.fits or @cname.lst, should required with iraf syntax.
     """
+    if os.path.isfile(oname):
+        print 'remove file ' + oname
+        os.remove(oname)
     iraf.crmedian(input=fn, output=oname, crmask='', median='', sigma='',
                   residual='', var0=0.0, var1=0.0, var2=0.0, lsigma=10.0,
-                  hsigma=3.0, ncmed=5, nlmed=5, ncmed=5, nlmed=5, ncsig=25,
-                  nlsig=25)
+                  hsigma=3.0, ncmed=5, nlmed=5, ncsig=25, nlsig=25)
 
 
 def main():
@@ -31,9 +33,14 @@ def main():
     we rename the file name.
     """
     filename = 'cor_lamp.lst'
-    crmedian('wftbo@'+filename, 'cwftbo@'+filename)
-    os.sys('rename "s/wftbo/pcwftbo/" wftbo*.fits')
-    os.sys('rename "s/cwftbo/wftbo/" cwftbo*.fits')
+    namelst = open(filename).readlines()
+    namelst = [i.strip() for i in namelst]
+    for name in namelst:
+        crmedian('wftbo'+name, 'cwftbo'+name)
+    print "rename 's/wftbo/pcwftbo/' wftbo*.fits"
+    os.system("rename 's/wftbo/pcwftbo/' wftbo*.fits")
+    print "rename 's/cwftbo/wftbo/' cwftbo*.fits"
+    os.system("rename 's/cwftbo/wftbo/' cwftbo*.fits")
 
 
 if __name__ == '__main__':
