@@ -17,6 +17,17 @@ script_path = os.path.dirname(os.path.realpath(__file__))
 std_path = script_path + os.sep + 'standarddir'
 lijiang_extinction_file = script_path + os.sep + 'LJextinct.dat'
 
+
+class obs:
+    """
+    the observatory information
+    """
+    name = 'Lijiang'
+    longitude = 100.03
+    latitude = 26.6951
+    altitude = 3180.0
+
+
 try:
     from termcolor import colored
 except ImportError:
@@ -311,7 +322,7 @@ def set_airmass(fn):
     iraf.longslit(dispaxis=2, nsum=1, observatory='Lijiang',
                   extinction=extfile, caldir=stdpath)
     for i in range(size):
-        iraf.setairmass(images=fn+'[%d]' % i, observatory='Lijiang',
+        iraf.setairmass(images=fn+'[%d]' % i, observatory=obs.name,
                         intype='beginning', outtype='effective', ra='ra',
                         dec='dec', equinox='epoch', st='lst', ut='date-obs',
                         date='date-obs', exposure='exptime', airmass='airmass',
