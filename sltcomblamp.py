@@ -4,12 +4,14 @@ import os
 import pyfits
 from pyraf import iraf
 
+
 def combinelamp(lst):
     iraf.noao()
     iraf.imred()
     iraf.ccdred()
-    iraf.imcombine(input = '%ftbo%ftbo%@' + lst, 
-            output = 'Lamp', combine = 'sum', reject = 'none')
+    iraf.imcombine(input='%ftbo%ftbo%@' + lst, output='Lamp', combine='sum',
+                   reject='none')
+
 
 def get_edge(filename):
     fit = pyfits.open(filename)
@@ -23,7 +25,8 @@ def get_edge(filename):
         return 1500
     else:
         print("can't find the edge of Helium and Neon fits in lamp")
-        
+
+
 def combine_fit(namelst):
     fit = pyfits.open(namelst[0])
     for name in namelst[1:]:
@@ -31,6 +34,7 @@ def combine_fit(namelst):
         fit[0].data = fit[0].data + tf[0].data
     fit[0].data = fit[0].data / float(len(namelst))
     return fit
+
 
 def combinelamp2(lst):
     print('run combinelamp')
@@ -52,19 +56,22 @@ def combinelamp2(lst):
         print('edge = %d' % edge)
         Hefit = combine_fit(Helst)
         Nefit = combine_fit(Nelst)
-        Hefit[0].data[edge:,:] = Nefit[0].data[edge:,:]
+        Hefit[0].data[edge:, :] = Nefit[0].data[edge:, :]
         Hefit.writeto('Lamp.fits')
-        
+
+
 def clear():
     if os.path.isfile('Lamp.fits'):
         print('remove Lamp.fits')
         os.remove('Lamp.fits')
 
+
 def main():
     lamplst = 'lamp.lst'
     clear()
     combinelamp2(lamplst)
-    #combinelamp(lamplst)
+    # combinelamp(lamplst)
+
 
 if __name__ == '__main__':
     main()
