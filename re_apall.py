@@ -6,7 +6,6 @@ Created on Thu Nov  5 16:54:57 2015
 @author: zzx
 """
 import os
-import pyfits
 from pyraf import iraf
 import sspecplot
 import func
@@ -25,31 +24,26 @@ def apall(lstfile):
     iraf.noao()
     iraf.twodspec()
     iraf.apextract(dispaxis=2, database='database')
-    lst = open(lstfile)
-    lst = [tmp.strip() for tmp in lst]
-    path = os.getcwd()
+    lst = [tmp.strip() for tmp in file(lstfile)]
     confdic = read_conf()
     for i in lst:
         infile = 'wftbo' + i
         outfile = 'awftbo' + i
-        laper = -15.0
-        raper = 15.0
+        laper, raper = -15.0, 15.0
         back_samp = '-50:-26,26:50'
-        fit = pyfits.open(infile)
         sname = func.sname(infile)
         print('obj name = '+sname)
-        fit.close()
         if sname in confdic:
             laper = confdic[sname][0]
             raper = confdic[sname][1]
             back_samp = confdic[sname][2]
         else:
-            print(sname+' not in aperture.lst')
+            print func.colored(sname+' not in aperture.lst', 'yellow')
         while True:
             if os.path.isfile(outfile):
                 print('remove ' + outfile)
                 os.remove(outfile)
-            delfile = path + os.sep + 'database/ap' + infile[0:-5]
+            delfile = os.getcwd()+os.sep+'database/ap'+infile[0:-5]
             if os.path.isfile(delfile):
                 print('remove ' + delfile)
                 os.remove(delfile)
