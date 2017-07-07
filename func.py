@@ -13,9 +13,10 @@ import webbrowser
 from termcolor import colored
 from pyraf import iraf
 
-script_path = os.path.dirname(os.path.realpath(__file__))
-std_path = script_path + os.sep + 'standarddir'
-lijiang_extinction_file = script_path + os.sep + 'LJextinct.dat'
+script_path = os.path.dirname(os.path.realpath(__file__))  # this script path
+config_path = script_path+os.sep+'config'  # the config file dir path
+std_path = script_path+os.sep+'standarddir'  # standard star template dir path
+extinction_file = config_path+os.sep+'LJextinct.dat'
 
 
 class obs:
@@ -43,7 +44,7 @@ def sname(fn):
     return : the source standard name
     type : string
     """
-    namelst = open(script_path+os.sep+'objcheck.lst').readlines()
+    namelst = open(config_path+os.sep+'objcheck.lst').readlines()
     namedic = dict([i.split() for i in namelst])
     objname = pyfits.getval(fn, 'OBJECT')
     objname = objname.split('_')[0]
@@ -52,7 +53,7 @@ def sname(fn):
     else:
         print(colored(('can\'t match the object name %s.\nPlease check and '
                        'edit the match file.') % objname, 'yellow'))
-        webbrowser.open(script_path+os.sep+'objcheck.lst')
+        webbrowser.open(config_path+os.sep+'objcheck.lst')
         raw_input('edit ok?(y)')
         return sname(fn)
 
@@ -105,7 +106,7 @@ def get_ra_dec(fn):
     type : string, string
     """
     standname = sname(fn)
-    radeclst = open(script_path+os.sep+'objradec.lst').readlines()
+    radeclst = open(config_path+os.sep+'objradec.lst').readlines()
     radecdic = dict([i.split(None, 1) for i in radeclst])
     if standname in radecdic:
         ra, dec = radecdic[standname].split()
@@ -113,7 +114,7 @@ def get_ra_dec(fn):
     else:
         print(colored('can\'t match %s, please check and edit objradec.lst'
                       % standname, 'yellow'))
-        webbrowser.open(script_path+os.sep+'objradec.lst')
+        webbrowser.open(config_path+os.sep+'objradec.lst')
         raw_input('edit ok?(y)')
         return get_ra_dec(fn)
 
@@ -152,7 +153,7 @@ def is_std(fn):
     return : whether the source is standard star
     type : boolean
     """
-    stdlstname = script_path + os.sep + 'standard.lst'
+    stdlstname = config_path+os.sep+'standard.lst'
     stdlst = open(stdlstname).readlines()
     stdset = set([i.split()[0].lower() for i in stdlst])
     objname = pyfits.getval(fn, 'OBJECT').split('_')[0].lower()
@@ -317,8 +318,8 @@ def set_airmass(fn):
     ra, dec = get_ra_dec(fn)
     set_ra_dec(fn, ra, dec)
     iraf.twodspec()
-    stdpath = script_path + os.sep + 'standarddir' + os.sep
-    extfile = script_path + os.sep + 'LJextinct.dat'
+    stdpath = std_path+os.sep
+    extfile = config_path+os.sep+'LJextinct.dat'
     iraf.longslit(dispaxis=2, nsum=1, observatory='Lijiang',
                   extinction=extfile, caldir=stdpath)
     for i in range(size):
@@ -339,7 +340,7 @@ def standard_star_info(fn):
     type : string, float, string
     """
     stdname = sname(fn)
-    stdlstname = script_path + os.sep + 'standard.lst'
+    stdlstname = config_path+os.sep+'standard.lst'
     lst = open(stdlstname).readlines()
     lst = dict([i.split(None, 2)[1:] for i in lst])
     mag, band = lst[stdname].split()

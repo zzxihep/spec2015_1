@@ -14,13 +14,13 @@ from func import script_path
 import func
 
 stdpath = func.std_path+os.sep
-extpath = func.lijiang_extinction_file
+extpath = func.extinction_file
 
 
 def standard(namelst):
     iraf.noao()
     iraf.twodspec()
-    iraf.longslit(dispaxis=2, nsum=1, observatory='Lijiang',
+    iraf.longslit(dispaxis=2, nsum=1, observatory=func.obs.name,
                   extinction=extpath, caldir=stdpath)
     stdnamelst = []
     for std_fitsname in namelst:
@@ -35,7 +35,7 @@ def standard(namelst):
                   beam_switch=False, apertures='', bandwidth='INDEF',
                   bandsep='INDEF',  # 30.0  20.0
                   fnuzero=3.6800000000000E-20, extinction=extpath,
-                  caldir=stdpath, observatory='Lijiang', interact=True,
+                  caldir=stdpath, observatory=func.obs.name, interact=True,
                   graphics='stdgraph', cursor='', star_name=stdname,
                   airmass='', exptime='', mag=stdmag, magband=stdmagband,
                   teff='', answer='yes')
@@ -50,7 +50,7 @@ def standard(namelst):
 def calibrate(namelst):
     iraf.noao()
     iraf.twodspec()
-    iraf.longslit(dispaxis=2, nsum=1, observatory='Lijiang',
+    iraf.longslit(dispaxis=2, nsum=1, observatory=func.obs.name,
                   extinction=extpath, caldir=stdpath)
     for fitname in namelst:
         outname = 'mark_' + fitname

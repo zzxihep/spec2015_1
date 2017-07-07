@@ -13,7 +13,7 @@ import func
 
 
 def read_conf():
-    path = func.script_path
+    path = func.config_path
     lst = open(path+os.sep+'aperture.lst').readlines()
     lst = [i.split() for i in lst]
     lst = [[i[0], [float(i[1]), float(i[2]), i[3]]] for i in lst]
