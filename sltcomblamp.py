@@ -3,6 +3,7 @@
 import os
 import pyfits
 from pyraf import iraf
+import func
 
 
 def combinelamp(lst):
@@ -36,26 +37,31 @@ def combine_fit(namelst):
     return fit
 
 
-def combinelamp2(lst):
+def combinelamp2(lstfn):
     print('run combinelamp')
-    namelst = ['ftbo'+i.strip() for i in open(lst).readlines()]
-    Helst, Nelst = [], []
+    namelst = ['ftbo'+i.strip() for i in open(lstfn).readlines()]
+    if func.get_grism(namelst[0]).lower() == 'grism_8':
+        combinelamp(lstfn)
+        return
+    Helst, Nelst, HeNelst = [], [], []
     for name in namelst:
-        fit = pyfits.open(name)
-        keyword = fit[0].header['OBJECT']
-        if 'he' in keyword.lower():
-            print('Helst <--- '+name)
-            Helst.append(name)
-        else:
-            print('Nelst <--- '+name)
+        if func.is_Helium(name):
+            if func.is_Neon(name):
+                print 'HeNelst <--- '+name
+                HeNelst.append(name)
+            else:
+                print 'Helst <--- '+name
+                Helst.append(name)
+        elif func.is_Neon(name):
+            print 'Nelst <--- '+name
             Nelst.append(name)
     if len(Helst) == 0 or len(Nelst) == 0:
-        combinelamp(lst)
+        combinelamp(lstfn)
     else:
         edge = get_edge(namelst[0])
         print('edge = %d' % edge)
-        Hefit = combine_fit(Helst)
-        Nefit = combine_fit(Nelst)
+        Hefit = combine_fit(Helst+HeNelst)
+        Nefit = combine_fit(Nelst+HeNelst)
         Hefit[0].data[edge:, :] = Nefit[0].data[edge:, :]
         Hefit.writeto('Lamp.fits')
 
