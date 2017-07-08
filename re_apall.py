@@ -11,34 +11,13 @@ import sspecplot
 import func
 
 
-def read_conf():
-    path = func.config_path
-    lst = open(path+os.sep+'aperture.lst').readlines()
-    lst = [i.split() for i in lst]
-    lst = [[i[0], [float(i[1]), float(i[2]), i[3]]] for i in lst]
-    lst = dict(lst)
-    return lst
-
-
-def apall(lstfile):
+def apall(ilst, olst):
     iraf.noao()
     iraf.twodspec()
     iraf.apextract(dispaxis=2, database='database')
-    lst = [tmp.strip() for tmp in file(lstfile)]
-    confdic = read_conf()
-    for i in lst:
-        infile = 'wftbo' + i
-        outfile = 'awftbo' + i
-        laper, raper = -15.0, 15.0
-        back_samp = '-50:-26,26:50'
-        sname = func.sname(infile)
-        print('obj name = '+sname)
-        if sname in confdic:
-            laper = confdic[sname][0]
-            raper = confdic[sname][1]
-            back_samp = confdic[sname][2]
-        else:
-            print func.colored(sname+' not in aperture.lst', 'yellow')
+    for i, infile in enumerate(ilst):
+        outfile = olst[i]
+        laper, raper, back_samp = func.get_aper(infile)
         while True:
             if os.path.isfile(outfile):
                 print('remove ' + outfile)
@@ -77,7 +56,10 @@ def apall(lstfile):
 
 def main():
     print('='*20 + ' extract ' + '='*20)
-    apall('cor_lamp.lst')
+    lst = [i.strip() for i in file('cor_lamp.lst')]
+    ilst = ['wftbo'+i for i in lst]
+    olst = ['awftbo'+i for i in lst]
+    apall(ilst, olst)
 
 
 if __name__ == '__main__':
