@@ -393,3 +393,49 @@ def get_slit(fn):
     name = pyfits.getval(fn, 'YAPRTNM')
     name = name.replace(' ', '_')
     return name
+
+
+def get_aper(fn):
+    """
+    get aperture parameter for iraf command apall.
+    the parameter include lower, upper, background window.
+    the parameter come from data file aperture.lst
+    if fn sname not in aperture.lst, will show a warn info and
+        return default value : -15.0, 15.0, '-50:-26,26:50'
+    fn : fits name
+    type : string
+    return : lower, upper, back_window
+             like -15.0, 15.0, '-50:-26,26:50'
+    type : float, float, string
+    """
+    lst = [i.split() for i in file(config_path+os.sep+'aperture.lst')]
+    dic = dict([[i[0], [float(i[1]), float(i[2]), i[3]]] for i in lst])
+    name = sname(fn)
+    if name in dic:
+        tmp = dic[name]
+        return float(tmp[0]), float(tmp[1]), tmp[2]
+    else:
+        print colored('%s %s not in aperture.lst' % (fn, name), 'yellow')
+        return -15.0, 15.0, '-50:-26,26:50'
+
+
+def get_trimsec(fn):
+    """
+    get trim section of fits fn. determined by Grism and Slit.
+    trim section info come from data file trim.lst
+    if grism_slit of fn not in trim.lst, will print a wran info and return None
+    fn : fits name
+    type : string
+    return (x1, x2, y1, y2)
+    type : (string, string, string, string)
+    """
+    grism = get_grism(fn)
+    slit = get_slit(fn)
+    name = grism + '_' + slit
+    lst = [i.split() for i in file(config_path+os.sep+'trim.lst')]
+    dic = dict([[i[0], [i[1], i[2], i[3], i[4]]] for i in lst])
+    if name in dic:
+        return tuple(dic[name])
+    else:
+        print colored('%s trim section not found in trim.lst', 'yellow!!!')
+        return None
