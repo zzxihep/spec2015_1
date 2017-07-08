@@ -28,35 +28,13 @@ def gen_Resp_2017(fitname):
     fit.writeto('Resp.fits')
 
 
-def get_trim_sec():
-    path = func.config_path
-    print('the script path is ' + path)
-    f = open(path + os.sep + 'trim.lst')
-    lst = f.readlines()
-    f.close()
-    lst = [i.split() for i in lst]
-    dirlst = os.listdir(os.getcwd())
-    fitname = ''
-    for name in dirlst:
-        if name[0:2] == 'YF' and name[-5:] == '.fits':
-            fit = pyfits.open(name)
-            if 'bias' not in fit[0].header['OBJECT'].lower():
-                fitname = name
-    fit = pyfits.open(fitname)
-    hdr = fit[0].header
-    curdirname = (hdr['YGRNM'] + '_' + hdr['YAPRTNM']).replace(' ', '_')
-    # curdirname = os.path.split(os.getcwd())[1]
-    for i in lst:
-        if i[0] == curdirname:
-            return (i[1], i[2], i[3], i[4])
-    print('cann\'t find trim sec')
-
-
 def coroverbiastrim(lstfile):
     iraf.noao()
     iraf.imred()
     iraf.ccdred()
-    x1, x2, y1, y2 = get_trim_sec()
+    namelst = [i.strip() for i in file(lstfile)]
+    name = namelst[0]
+    x1, x2, y1, y2 = func.get_trimsec(name)
     iraf.ccdproc(images='@'+lstfile+'//[1]', output='%bo%bo%@'+lstfile,
                  ccdtype='', max_cache=0, noproc=False, fixpix=False,
                  overscan=True, trim=False, zerocor=True, darkcor=False,
@@ -95,7 +73,6 @@ def combine_flat(lstfile):
 
 
 def gen_Resp_2016():
-    script_path = func.script_path
     iraf.twodspec()
     iraf.longslit(dispaxis=2, nsum=1, observatory='observatory',
                   extinction=func.extinction_file,
