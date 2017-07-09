@@ -4,29 +4,46 @@ import os
 import shutil
 from pyraf import iraf
 
+"""
+generate spec Zero file individually.
+then cp Zero.fits to every Grism_xx_Slit_xx dir.
+"""
 
-def coroverscan(filename):
+
+def coroverscan(lstfn):
+    """
+    call iraf command ccdproc, overscan correct.
+    lstfn : lst file name
+    type : string
+    output file : oYF*.fits
+    """
     iraf.noao()
     iraf.imred()
     iraf.ccdred()
-    iraf.ccdproc(images='@'+filename+'//[1]', output='%o%o%@'+filename,
-                 ccdtype='', max_cache=0, noproc=False, fixpix=False,
-                 overscan=True, trim=False, zerocor=False, darkcor=False,
-                 flatcor=False, illumcor=False, fringecor=False, readcor=False,
-                 scancor=False, readaxis='line', fixfile='',
-                 biassec='[5:45,1:4612]', trimsec='', zero='', dark='',
-                 flat='', illum='', fringe='', minreplace=1.0,
-                 scantype='shortscan', nscan=1, interactive=False,
-                 function='chebyshev', order=1, sample='*', naverage=1,
-                 niterate=1, low_reject=3.0, high_reject=3.0, grow=1.0)
+    iraf.ccdproc(images='@'+lstfn+'//[1]', output='%o%o%@'+lstfn, ccdtype='',
+                 max_cache=0, noproc=False, fixpix=False, overscan=True,
+                 trim=False, zerocor=False, darkcor=False, flatcor=False,
+                 illumcor=False, fringecor=False, readcor=False, scancor=False,
+                 readaxis='line', fixfile='', biassec='[5:45,1:4612]',
+                 trimsec='', zero='', dark='', flat='', illum='', fringe='',
+                 minreplace=1.0, scantype='shortscan', nscan=1,
+                 interactive=False, function='chebyshev', order=1, sample='*',
+                 naverage=1, niterate=1, low_reject=3.0, high_reject=3.0,
+                 grow=1.0)
     iraf.flpr()
 
 
-def combinebias(filename):
+def combinebias(lstfn):
+    """
+    call iraf command zerocombine, combine bias fits.
+    lstfn : lst file name
+    type : string
+    output file : Zero.fits
+    """
     iraf.noao()
     iraf.imred()
     iraf.ccdred()
-    iraf.zerocombine(input='o//@' + filename, output='Zero', combine='average',
+    iraf.zerocombine(input='o//@'+lstfn, output='Zero', combine='average',
                      reject='minmax', ccdtype='', process=False, delete=False,
                      clobber=False, scale='none', statsec='', nlow=0, nhigh=1,
                      nkeep=1, mclip=True, lsigma=3.0, hsigma=3.0,

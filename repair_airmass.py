@@ -8,10 +8,10 @@ from pyraf import iraf
 import func
 
 """
-Some day Lijiang data airmass and other keyword is absolutely wrong.
+Some day Lijiang data airmass and other keywords are absolutely wrong.
 We can not get the right airmass just through command setairmass.
 This routine is to repair the wrong keyword airmass and other keyword.
-The default repaired fits are ftbo*.fits
+The default repaired fits are awftbo*.fits
 """
 
 
