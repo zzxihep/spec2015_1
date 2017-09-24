@@ -113,8 +113,8 @@ def clear():
 
 
 def add_DISPAXIS(filelst):
-    iraf.hedit(images='@'+filelst+'[1]', fields='DISPAXIS', value='2',
-               add='Yes', verify='No', show='Yes', update='Yes')
+    iraf.hedit(images='@'+filelst+'[0]', fields='DISPAXIS', value='2',
+               addonly='Yes', verify='No', show='Yes', update='Yes')
 
 
 def main():

@@ -1,12 +1,14 @@
 #! /usr/bin/env python
 
 import os
+import glob
 import pyfits
 from pyraf import iraf
+import func
 
 
 def get_trim_sec():
-    path = os.path.split(os.path.realpath(__file__))[0]
+    path = func.config_path
     print('the script path is ' + path)
     f = open(path + os.sep + 'trim.lst')
     lst = f.readlines()
@@ -60,6 +62,12 @@ def coroverbiastrim(lstfile):
 
 
 def combine_flat(lstfile):
+    if os.path.isfile('Halogen.fits'):
+        print 'remove Halogen.fits'
+        os.remove('Halogen.fits')
+    if os.path.isfile('Resp.fits'):
+        print 'remove Resp.fits'
+        os.remove('Resp.fits')
     iraf.noao()
     iraf.imred()
     iraf.ccdred()
@@ -69,20 +77,23 @@ def combine_flat(lstfile):
                      scale='mode', statsec='', nlow=1, nhigh=1, nkeep=1,
                      mclip=True, lsigma=3.0, hsigma=3.0, rdnoise='rdnoise',
                      gain='gain', snoise=0.0, pclip=-0.5, blank=1.0)
-    script_path = os.path.split(os.path.realpath(__file__))[0]
     iraf.twodspec()
-    iraf.longslit(dispaxis=2, nsum=1, observatory='observatory',
-                  extinction=script_path + os.sep + 'LJextinct.dat',
-                  caldir=script_path+os.sep+'standarddir'+os.sep,
+    iraf.longslit(dispaxis=2, nsum=1, observatory='Lijiang',
+                  extinction=func.config_path +os.sep+ 'LJextinct.dat',
+                  caldir=func.std_path+os.sep,
                   interp='poly5')
     iraf.response(calibration='Halogen', normalization='Halogen',
                   response='Resp', interactive=True, threshold='INDEF',
-                  sample='*', naverage=1, function='spline3', order=45,
+                  sample='*', naverage=1, function='spline3', order=25,
                   low_reject=10.0, high_reject=10.0, niterate=1, grow=0.0,
                   graphics='stdgraph', cursor='')
 
 
 def corhalogen(lstfile):
+    namelst = glob.glob('ftbo*.fits')
+    for name in namelst:
+        print 'remove ', name
+        os.remove(name)
     iraf.noao()
     iraf.imred()
     iraf.ccdred()
@@ -111,14 +122,14 @@ def clear():
 
 
 def add_DISPAXIS(filelst):
-    iraf.hedit(images='@' + filelst + '[1]', fields='DISPAXIS',
-               value='2', add='Yes', verify='No', show='Yes', update='Yes')
+    iraf.hedit(images='@' + filelst + '[0]', fields='DISPAXIS',
+               value='2', addonly='Yes', delete='No', verify='No', show='Yes', update='Yes')
 
 
 def main():
     clear()
     print('=' * 20 + ' correct trim bias overscan ' + '=' * 20)
-    # add_DISPAXIS('all.lst')
+    add_DISPAXIS('all.lst')
     coroverbiastrim('all.lst')
     print('=' * 20 + ' correct flat ' + '=' * 20)
     combine_flat('halogen.lst')
