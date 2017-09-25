@@ -17,6 +17,14 @@ stdpath = func.std_path+os.sep
 extpath = func.extinction_file
 
 
+def get_band_width_sep(fn):
+    name = func.sname(fn)
+    if name == 'hd93521':
+        return 30.0, 20.0
+    else:
+        return 'INDEF', 'INDEF'
+
+
 def standard(namelst):
     iraf.noao()
     iraf.twodspec()
@@ -31,9 +39,10 @@ def standard(namelst):
     if os.path.isfile('Std'):
         print('remove file Std')
         os.remove('Std')
+    wid, sep = get_band_width_sep(namelst[0])
     iraf.standard(input=stdnamestr, output='Std', samestar=True,
-                  beam_switch=False, apertures='', bandwidth='INDEF',
-                  bandsep='INDEF',  # 30.0  20.0
+                  beam_switch=False, apertures='', bandwidth=wid,
+                  bandsep=sep,  # 30.0  20.0
                   fnuzero=3.6800000000000E-20, extinction=extpath,
                   caldir=stdpath, observatory=func.obs.name, interact=True,
                   graphics='stdgraph', cursor='', star_name=stdname,
