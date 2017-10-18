@@ -120,7 +120,7 @@ def add_DISPAXIS(filelst):
 def main():
     clear()
     print('='*20+' correct trim bias overscan '+'='*20)
-    # add_DISPAXIS('all.lst')
+    add_DISPAXIS('all.lst')
     coroverbiastrim('all.lst')
     print('='*20+' correct flat '+'='*20)
     combine_flat('halogen.lst')
