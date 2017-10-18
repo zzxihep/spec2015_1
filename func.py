@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # @Author: zhixiang zhang <zzx>
 # @Date:   26-Jun-2017
 # @Email:  zhangzx@ihep.ac.cn
@@ -5,21 +7,29 @@
 # @Last modified by:   zzx
 # @Last modified time: 02-Jul-2017
 
+"""
+basic function of project spec2015_1
+"""
 
 import os
-import pyfits
 import shutil
 import webbrowser
-from termcolor import colored
+import pyfits
 from pyraf import iraf
+try:
+    from termcolor import colored
+except ImportError:
+    def colored(string, color):
+        """ a instead of function colored"""
+        return string
 
 script_path = os.path.dirname(os.path.realpath(__file__))  # this script path
-config_path = script_path+os.sep+'config'  # the config file dir path
+config_path = script_path + os.sep + 'config'  # the config file dir path
 std_path = script_path+os.sep+'standarddir'  # standard star template dir path
-extinction_file = config_path+os.sep+'LJextinct.dat'
+extinction_file = config_path + os.sep + 'LJextinct.dat'
 
 
-class obs:
+class obs(object):
     """
     the observatory information
     """
@@ -28,12 +38,26 @@ class obs:
     latitude = 26.6951
     altitude = 3180.0
 
+    def __init__(self):
+        pass
 
-try:
-    from termcolor import colored
-except ImportError:
-    def colored(string, color):
-        return string
+
+def copy_lstfile(lstfile, dst):
+    """
+    copy lstfile to dst, and copy the files(name in lstfile) to dst
+    lstfile : the lst file name(include abs path), like '/*/G4S5/abc.lst'
+    type : string
+    dst : derectory path, like 'G4S5', '/*/G4S5', 'G4S5/'
+    type : string
+    """
+    print "copy %s to %s" % (lstfile, dst)
+    shutil.copyfile(lstfile, dst=dst + os.sep + os.path.basename(lstfile))
+    path = os.path.dirname(lstfile)
+    namelst = open(lstfile).readlines()
+    namelst = [i.strip() for i in namelst]
+    for name in namelst:
+        print "copy %s to %s" % (name, dst)
+        shutil.copyfile(path + os.sep + name, dst=dst + os.sep + name)
 
 
 def sname(fn):
@@ -44,18 +68,17 @@ def sname(fn):
     return : the source standard name
     type : string
     """
-    namelst = open(config_path+os.sep+'objcheck.lst').readlines()
+    namelst = open(config_path + os.sep + 'objcheck.lst').readlines()
     namedic = dict([i.split() for i in namelst])
     objname = pyfits.getval(fn, 'OBJECT')
     objname = objname.split('_')[0]
     if objname in namedic:
         return namedic[objname]
-    else:
-        print(colored(('can\'t match the object name %s.\nPlease check and '
-                       'edit the match file.') % objname, 'yellow'))
-        webbrowser.open(config_path+os.sep+'objcheck.lst')
-        raw_input('edit ok?(y)')
-        return sname(fn)
+    print(colored(('can\'t match the object name %s.\nPlease check and '
+                   'edit the match file.') % objname, 'yellow'))
+    webbrowser.open(config_path + os.sep + 'objcheck.lst')
+    raw_input('edit ok?(y)')
+    return sname(fn)
 
 
 def set_sname(fn):
@@ -74,27 +97,12 @@ def set_sname(fn):
                    update='Yes')
     else:
         for i in range(len(size)):
-            iraf.hedit(images=fn+'[%d]' % i, fields='SNAME', value=standname,
+            iraf.hedit(images=fn + '[%d]' % i, fields='SNAME', value=standname,
                        add='Yes', addonly='No', delete='No', verify='No',
                        show='Yes', update='Yes')
 
 
-def copy_lstfile(lstfile, dst):
-    """
-    copy lstfile to dst, and copy the files(name in lstfile) to dst
-    lstfile : the lst file name(include abs path), like '/*/G4S5/abc.lst'
-    type : string
-    dst : derectory path, like 'G4S5', '/*/G4S5', 'G4S5/'
-    type : string
-    """
-    print("copy %s to %s" % (lstfile, dst))
-    shutil.copyfile(lstfile, dst=dst+os.sep+os.path.basename(lstfile))
-    path = os.path.dirname(lstfile)
-    namelst = open(lstfile).readlines()
-    namelst = [i.strip() for i in namelst]
-    for name in namelst:
-        print("copy %s to %s" % (name, dst))
-        shutil.copyfile(path+os.sep+name, dst=dst+os.sep+name)
+
 
 
 def get_ra_dec(fn):
@@ -106,17 +114,16 @@ def get_ra_dec(fn):
     type : string, string
     """
     standname = sname(fn)
-    radeclst = open(config_path+os.sep+'objradec.lst').readlines()
+    radeclst = open(config_path + os.sep + 'objradec.lst').readlines()
     radecdic = dict([i.split(None, 1) for i in radeclst])
     if standname in radecdic:
         ra, dec = radecdic[standname].split()
         return ra, dec
-    else:
-        print(colored('can\'t match %s, please check and edit objradec.lst'
-                      % standname, 'yellow'))
-        webbrowser.open(config_path+os.sep+'objradec.lst')
-        raw_input('edit ok?(y)')
-        return get_ra_dec(fn)
+    print(colored('can\'t match %s, please check and edit objradec.lst'
+                  % standname, 'yellow'))
+    webbrowser.open(config_path + os.sep + 'objradec.lst')
+    raw_input('edit ok?(y)')
+    return get_ra_dec(fn)
 
 
 def set_ra_dec(fn, ra, dec):
@@ -137,10 +144,10 @@ def set_ra_dec(fn, ra, dec):
                    delete='No', verify='No', show='Yes', update='Yes')
     else:
         for i in range(len(size)):
-            iraf.hedit(images=fn+'[%d]' % i, fields='RA', value=ra, add='Yes',
-                       addonly='No', delete='No', verify='No', show='Yes',
-                       update='Yes')
-            iraf.hedit(images=fn+'[%d]' % i, fields='DEC', value=dec,
+            iraf.hedit(images=fn + '[%d]' % i, fields='RA', value=ra,
+                       add='Yes', addonly='No', delete='No', verify='No',
+                       show='Yes', update='Yes')
+            iraf.hedit(images=fn + '[%d]' % i, fields='DEC', value=dec,
                        add='Yes', addonly='No', delete='No', verify='No',
                        show='Yes', update='Yes')
 
@@ -153,7 +160,7 @@ def is_std(fn):
     return : whether the source is standard star
     type : boolean
     """
-    stdlstname = config_path+os.sep+'standard.lst'
+    stdlstname = config_path + os.sep + 'standard.lst'
     stdlst = open(stdlstname).readlines()
     stdset = set([i.split()[0].lower() for i in stdlst])
     objname = pyfits.getval(fn, 'OBJECT').split('_')[0].lower()
@@ -174,10 +181,7 @@ def is_halogen(fn):
     type : boolean
     """
     val = pyfits.getval(fn, 'CLAMP1')
-    if int(val) == 0:
-        return False
-    else:
-        return True
+    return bool(int(val) != 0)
 
 
 def is_lamp(fn):
@@ -192,13 +196,10 @@ def is_lamp(fn):
     return :
     type : boolean
     """
-    val2 = pyfits.getval(fn, 'CLAMP2')
-    val3 = pyfits.getval(fn, 'CLAMP3')
-    val4 = pyfits.getval(fn, 'CLAMP4')
-    if int(val2) == 1 or int(val3) == 1 or int(val4) == 1:
-        return True
-    else:
-        return False
+    val2 = int(pyfits.getval(fn, 'CLAMP2'))
+    val3 = int(pyfits.getval(fn, 'CLAMP3'))
+    val4 = int(pyfits.getval(fn, 'CLAMP4'))
+    return True if val2 == 1 or val3 == 1 or val4 == 1 else False
 
 
 def is_FeAr(fn):
@@ -213,10 +214,7 @@ def is_FeAr(fn):
     type : boolean
     """
     val2 = pyfits.getval(fn, 'CLAMP2')
-    if int(val2) == 1:
-        return True
-    else:
-        return False
+    return bool(int(val2) == 1)
 
 
 def is_Neon(fn):
@@ -233,8 +231,7 @@ def is_Neon(fn):
     val3 = pyfits.getval(fn, 'CLAMP3')
     if int(val3) == 1:
         return True
-    else:
-        return False
+    return False
 
 
 def is_Helium(fn):
@@ -249,10 +246,7 @@ def is_Helium(fn):
     type : boolean
     """
     val4 = pyfits.getval(fn, 'CLAMP4')
-    if int(val4) == 1:
-        return True
-    else:
-        return False
+    return bool(int(val4) == 1)
 
 
 def is_bias(fn):
@@ -265,10 +259,7 @@ def is_bias(fn):
     type : boolean
     """
     val = pyfits.getval(fn, 'IMAGETYP')
-    if val.lower().strip() == 'bias':
-        return True
-    else:
-        return False
+    return bool(val.lower().strip() == 'bias')
 
 
 def is_spec(fn):
@@ -311,19 +302,19 @@ def set_airmass(fn):
                 print(colored(('\'AIROLD\' keyword alreay exist, the airmass '
                                'old will not saved'), 'yellow'))
             else:
-                iraf.hedit(images=fn+'[%d]' % i, fields='AIROLD',
+                iraf.hedit(images=fn + '[%d]' % i, fields='AIROLD',
                            value=airmassold, add='Yes', addonly='Yes',
                            delete='No', verify='No', show='Yes', update='Yes')
     fit.close()
     ra, dec = get_ra_dec(fn)
     set_ra_dec(fn, ra, dec)
     iraf.twodspec()
-    stdpath = std_path+os.sep
-    extfile = config_path+os.sep+'LJextinct.dat'
+    stdpath = std_path + os.sep
+    extfile = config_path + os.sep + 'LJextinct.dat'
     iraf.longslit(dispaxis=2, nsum=1, observatory='Lijiang',
                   extinction=extfile, caldir=stdpath)
     for i in range(size):
-        iraf.setairmass(images=fn+'[%d]' % i, observatory=obs.name,
+        iraf.setairmass(images=fn + '[%d]' % i, observatory=obs.name,
                         intype='beginning', outtype='effective', ra='ra',
                         dec='dec', equinox='epoch', st='lst', ut='date-obs',
                         date='date-obs', exposure='exptime', airmass='airmass',
@@ -340,7 +331,7 @@ def standard_star_info(fn):
     type : string, float, string
     """
     stdname = sname(fn)
-    stdlstname = config_path+os.sep+'standard.lst'
+    stdlstname = config_path + os.sep + 'standard.lst'
     lst = open(stdlstname).readlines()
     lst = dict([i.split(None, 2)[1:] for i in lst])
     mag, band = lst[stdname].split()
@@ -408,15 +399,14 @@ def get_aper(fn):
              like -15.0, 15.0, '-50:-26,26:50'
     type : float, float, string
     """
-    lst = [i.split() for i in file(config_path+os.sep+'aperture.lst')]
+    lst = [i.split() for i in file(config_path + os.sep + 'aperture.lst')]
     dic = dict([[i[0], [float(i[1]), float(i[2]), i[3]]] for i in lst])
     name = sname(fn)
     if name in dic:
         tmp = dic[name]
         return float(tmp[0]), float(tmp[1]), tmp[2]
-    else:
-        print colored('%s %s not in aperture.lst' % (fn, name), 'yellow')
-        return -15.0, 15.0, '-50:-26,26:50'
+    print colored('%s %s not in aperture.lst' % (fn, name), 'yellow')
+    return -15.0, 15.0, '-50:-26,26:50'
 
 
 def get_trimsec(fn):
@@ -432,10 +422,9 @@ def get_trimsec(fn):
     grism = get_grism(fn)
     slit = get_slit(fn)
     name = grism + '_' + slit
-    lst = [i.split() for i in file(config_path+os.sep+'trim.lst')]
+    lst = [i.split() for i in file(config_path + os.sep + 'trim.lst')]
     dic = dict([[i[0], [i[1], i[2], i[3], i[4]]] for i in lst])
     if name in dic:
         return tuple(dic[name])
-    else:
-        print colored('%s trim section not found in trim.lst', 'yellow!!!')
-        return None
+    print colored('%s trim section not found in trim.lst', 'yellow!!!')
+    return None
