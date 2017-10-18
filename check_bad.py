@@ -106,13 +106,13 @@ def check_halogen(abspathfile):
         getval = raw_input('no halogen file up to standard, are you want '
                            'delete the halogen fits(d), only delete '
                            'halogen.lst(h), do nothing(n or Enter)')
-        if getval == d:
+        if getval == 'd':
             for i in fitlst:
                 print('remove ' + path + os.sep + i)
                 os.remove(path + os.sep + i)
             print('remove ' + abspathfile)
             os.remove(abspathfile)
-        elif getval == h:
+        elif getval == 'h':
             print('remove ' + abspathfile)
             os.remove(abspathfile)
         else:
