@@ -13,14 +13,14 @@ def gen_Resp_2017(fitname):
     fit = pyfits.open(fitname)
     data = fit[0].data
     print('median filter')
-    medain_data = ndimage.median_filter(data, size=10)
+    medain_data = ndimage.median_filter(data, size=40)
     rest_data = np.abs(data-medain_data)
-    fit_restdata = ndimage.gaussian_filter(rest_data, sigma=20)
+    fit_restdata = ndimage.gaussian_filter(rest_data, sigma=40)
     arg = np.where(rest_data > 3*fit_restdata)
     newdata = data.copy()
     newdata[arg] = medain_data[arg]
     print('gaussian filter')
-    gauss_data = ndimage.gaussian_filter(newdata, sigma=10)
+    gauss_data = ndimage.gaussian_filter(newdata, sigma=60)
     fit[0].data = data / gauss_data
     fit[0].data = fit[0].data / np.mean(fit[0].data)
     fit[0].header['CCDMEAN'] = 1.0
