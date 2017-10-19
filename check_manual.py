@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import os
-import pyfits
+import webbrowser
 from pyraf import iraf
 
 
@@ -9,9 +9,9 @@ def check_bias():
     biaspath = os.getcwd() + os.sep + 'bias'
     if os.path.isfile(biaspath + os.sep + 'spec_bias.lst'):
         os.chdir('bias')
-        os.system('gedit spec_bias.lst &')
+        webbrowser.open('spec_bias.lst')
         iraf.imexamine(input='@spec_bias.lst[1]', frame=1)
-        dirname, filename = os.path.split(os.getcwd())
+        dirname = os.path.dirname(os.getcwd())
         os.chdir(dirname)
         iraf.flpr()
     else:
@@ -25,7 +25,7 @@ def check_other(path):
                   'std.lst', 'cor_std.lst']
         for i in lstlst:
             if os.path.isfile(i):
-                os.system('gedit %s &' % i)
+                webbrowser.open(i)
                 iraf.imexamine(input='@%s[1]' % i, frame=1)
         dirname, filename = os.path.split(os.getcwd())
         os.chdir(dirname)
