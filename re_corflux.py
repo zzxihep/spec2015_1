@@ -19,7 +19,7 @@ extpath = func.extinction_file
 
 def get_band_width_sep(fn):
     name = func.sname(fn)
-    if name == 'hd93521':
+    if name == 'hd93521' or name == 'feige34':
         return 30.0, 20.0
     else:
         return 'INDEF', 'INDEF'
