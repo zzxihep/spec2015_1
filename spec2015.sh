@@ -7,6 +7,7 @@
 # @Last modified by:   zzx
 # @Last modified time: 02-Jul-2017
 
+${0%/*}/run_ds9_or_ximtool.sh
 ${0%/*}/mv_to_spec.py
 cd spec
 ${0%/*}/classify_fits.py
