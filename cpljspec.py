@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+"""
+copy flux spec and counts spec to a specdir named 'ljspec'
+the spec files are classified by their keyword 'SNAME'
+"""
+
 import os
 import sys
 import shutil

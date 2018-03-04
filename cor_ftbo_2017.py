@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import os
-import pyfits
+from astropy.io import fits
 from pyraf import iraf
 from scipy import ndimage
 import numpy as np
@@ -10,17 +10,17 @@ import func
 
 def gen_Resp_2017(fitname):
     print('Run gen_flat')
-    fit = pyfits.open(fitname)
+    fit = fits.open(fitname)
     data = fit[0].data
     print('median filter')
     medain_data = ndimage.median_filter(data, size=40)
     rest_data = np.abs(data-medain_data)
-    fit_restdata = ndimage.gaussian_filter(rest_data, sigma=40)
+    fit_restdata = ndimage.gaussian_filter(rest_data, sigma=30)
     arg = np.where(rest_data > 3*fit_restdata)
     newdata = data.copy()
     newdata[arg] = medain_data[arg]
     print('gaussian filter')
-    gauss_data = ndimage.gaussian_filter(newdata, sigma=60)
+    gauss_data = ndimage.gaussian_filter(newdata, sigma=30)
     fit[0].data = data / gauss_data
     fit[0].data = fit[0].data / np.mean(fit[0].data)
     fit[0].header['CCDMEAN'] = 1.0

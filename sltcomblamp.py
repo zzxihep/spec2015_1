@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os
-import pyfits
+from astropy.io import fits
 from pyraf import iraf
 import func
 
@@ -15,7 +15,7 @@ def combinelamp(lst):
 
 
 def get_edge(filename):
-    fit = pyfits.open(filename)
+    fit = fits.open(filename)
     keyword = fit[0].header['YGRNM']
     print(keyword)
     if keyword.strip().lower() == 'grism 14':
@@ -29,9 +29,9 @@ def get_edge(filename):
 
 
 def combine_fit(namelst):
-    fit = pyfits.open(namelst[0])
+    fit = fits.open(namelst[0])
     for name in namelst[1:]:
-        tf = pyfits.open(name)
+        tf = fits.open(name)
         fit[0].data = fit[0].data + tf[0].data
     fit[0].data = fit[0].data / float(len(namelst))
     return fit

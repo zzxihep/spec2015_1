@@ -72,6 +72,7 @@ def sname(fn):
     namedic = dict([i.split() for i in namelst])
     objname = pyfits.getval(fn, 'OBJECT')
     objname = objname.split('_')[0]
+    objname = objname.replace(' ', '')
     if objname in namedic:
         return namedic[objname]
     print(colored(('can\'t match the object name %s.\nPlease check and '
