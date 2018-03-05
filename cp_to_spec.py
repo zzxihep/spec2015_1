@@ -35,7 +35,7 @@ def main():
             naxis1 = pyfits.getval(i, 'NAXIS1', 1)
             naxis2 = pyfits.getval(i, 'NAXIS2', 1)
             if naxis1 == 2148 and naxis2 == 4612:
-                print('mv %s to spec/' % i)
+                print('cp %s to spec/' % i)
                 shutil.copyfile(i, '.'+os. sep+'spec'+os.sep+i)
 
 
