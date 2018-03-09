@@ -46,3 +46,13 @@ mark_awftbo*.fits
 * Lamp.fits : 合并后的定标灯谱文件
 * Std : 标准星光谱生成的文件
 * Sens.fits : 由标准星光谱生成的响应曲线文件
+
+### Dependencies
+- astropy
+- ephem
+- matplotlib
+- numpy
+- pyfits
+- pyraf
+- scipy
+- termcolor
