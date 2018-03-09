@@ -1,6 +1,7 @@
 #!/Users/dupu/Software/ureka/Ureka/python/bin/python
 
-import os, sys
+import os
+import sys
 import pyfits
 from pyraf import iraf
 
@@ -57,37 +58,37 @@ def correct_airmass():
         ra, dec = findradec(name)
         print name, ra, dec
         for j in xrange(extnum):
-            stdout = iraf.hselect(images = namelst[i] + '[%i]' % j, fields = 'airmass', 
+            stdout = iraf.hselect(images = namelst[i] + '[%i]' % j, fields = 'airmass',
                     expr = 'yes', Stdout = 1)
             airold = float(stdout[0])
             print '+' * 5, namelst[i], 'ext:', j, 'airmass_old:', airold
-            iraf.hedit(images = namelst[i] + '[%i]' % j, fields = 'airold', 
-                    value = airold, add = 'yes', addonly = 'yes', delete = 'no', 
+            iraf.hedit(images = namelst[i] + '[%i]' % j, fields = 'airold',
+                    value = airold, add = 'yes', addonly = 'yes', delete = 'no',
                     verify = 'no', show = 'yes', update = 'yes')
-            iraf.hedit(images = namelst[i] + '[%i]' % j, fields = 'sname', 
-                    value = name, add = 'yes', addonly = 'yes', delete = 'no', 
+            iraf.hedit(images = namelst[i] + '[%i]' % j, fields = 'sname',
+                    value = name, add = 'yes', addonly = 'yes', delete = 'no',
                     verify = 'no', show = 'yes', update = 'yes')
-            iraf.hedit(images = namelst[i] + '[%i]' % j, fields = 'sname', 
-                    value = name, add = 'yes', addonly = 'yes', delete = 'no', 
+            iraf.hedit(images = namelst[i] + '[%i]' % j, fields = 'sname',
+                    value = name, add = 'yes', addonly = 'yes', delete = 'no',
                     verify = 'no', show = 'yes', update = 'yes')
-            iraf.hedit(images = namelst[i] + '[%i]' % j, fields = 'ra', 
-                    value = ra, add = 'yes', addonly = 'yes', delete = 'no', 
+            iraf.hedit(images = namelst[i] + '[%i]' % j, fields = 'ra',
+                    value = ra, add = 'yes', addonly = 'yes', delete = 'no',
                     verify = 'no', show = 'yes', update = 'yes')
-            iraf.hedit(images = namelst[i] + '[%i]' % j, fields = 'dec', 
-                    value = dec, add = 'yes', addonly = 'yes', delete = 'no', 
+            iraf.hedit(images = namelst[i] + '[%i]' % j, fields = 'dec',
+                    value = dec, add = 'yes', addonly = 'yes', delete = 'no',
                     verify = 'no', show = 'yes', update = 'yes')
             iraf.twodspec()
-            iraf.longslit(dispaxis = 2, nsum = 1, observatory = 'Lijiang', 
+            iraf.longslit(dispaxis = 2, nsum = 1, observatory = 'Lijiang',
                     extinction = 'onedstds$LJextinct.dat', caldir = 'onedstds$spec50cal/')
-            iraf.setairmass(images = namelst[i] + '[%i]' % j, 
-                    observatory = 'Lijiang', intype = 'beginning', 
-                    outtype = 'effective', ra = 'ra', dec = 'dec', 
-                    equinox = 'epoch', st = 'lst', ut = 'date-obs', 
-                    date = 'date-obs', exposure = 'exptime', airmass = 'airmass', 
-                    utmiddle = 'utmiddle', scale = 750.0, show = 'yes', 
+            iraf.setairmass(images = namelst[i] + '[%i]' % j,
+                    observatory = 'Lijiang', intype = 'beginning',
+                    outtype = 'effective', ra = 'ra', dec = 'dec',
+                    equinox = 'epoch', st = 'lst', ut = 'date-obs',
+                    date = 'date-obs', exposure = 'exptime', airmass = 'airmass',
+                    utmiddle = 'utmiddle', scale = 750.0, show = 'yes',
                     override = 'yes', update = 'yes')
             print 'name                            airmass_new     airmass_old'
-            iraf.hselect(images = namelst[i] + '[%i]' % j, fields = '$I,airmass,airold', 
+            iraf.hselect(images = namelst[i] + '[%i]' % j, fields = '$I,airmass,airold',
                     expr = 'yes')
 
 def findradec(name):
@@ -139,42 +140,42 @@ def standard():
 #    standname = raw_input('please input standard star name:')
 #    print 'standard star name:', standname
     iraf.twodspec()
-    iraf.longslit(dispaxis = 2, nsum = 1, observatory = 'Lijiang', 
+    iraf.longslit(dispaxis = 2, nsum = 1, observatory = 'Lijiang',
             extinction = 'onedstds$LJextinct.dat', caldir = 'onedstds$ctiocal/')
     for i in xrange(len(namelst)):
         print '+' * 10, namelst[i]
         iraf.hselect(images = namelst[i], fields = '$I,object', expr = 'yes')
         standname = raw_input('please input standard star name:')
         print 'standard star name:', standname
-        #iraf.standard(input = namelst[i], output = namelst[i].split('.')[0] + '.std', 
-        #        samestar = 'yes', interact = 'yes', star_name = standname, airmass = '', 
-        #        exptime = '', extinction = 'onedstds$LJextinct.dat', 
+        #iraf.standard(input = namelst[i], output = namelst[i].split('.')[0] + '.std',
+        #        samestar = 'yes', interact = 'yes', star_name = standname, airmass = '',
+        #        exptime = '', extinction = 'onedstds$LJextinct.dat',
         #        caldir = 'onedstds$ctiocal/')
-        iraf.standard(input = namelst[i], output = 'std', 
-                samestar = 'yes', interact = 'yes', star_name = standname, airmass = '', 
-                exptime = '', extinction = 'onedstds$LJextinct.dat', 
+        iraf.standard(input = namelst[i], output = 'std',
+                samestar = 'yes', interact = 'yes', star_name = standname, airmass = '',
+                exptime = '', extinction = 'onedstds$LJextinct.dat',
                 caldir = 'onedstds$ctiocal/')
 
-#    iraf.standard(input = temp, output = 'std', 
-#            samestar = 'yes', interact = 'yes', star_name = standname, airmass = '', 
-#            exptime = '', extinction = 'onedstds$LJextinct.dat', 
+#    iraf.standard(input = temp, output = 'std',
+#            samestar = 'yes', interact = 'yes', star_name = standname, airmass = '',
+#            exptime = '', extinction = 'onedstds$LJextinct.dat',
 #            caldir = 'onedstds$ctiocal/')
 
 def sensfunc():
     iraf.twodspec()
-    iraf.longslit(dispaxis = 2, nsum = 1, observatory = 'Lijiang', 
+    iraf.longslit(dispaxis = 2, nsum = 1, observatory = 'Lijiang',
             extinction = 'onedstds$LJextinct.dat', caldir = 'onedstds$ctiocal/')
-    iraf.sensfunc(standards = 'std', sensitivity = 'sens', 
+    iraf.sensfunc(standards = 'std', sensitivity = 'sens',
             extinction = 'onedstds$LJextinct.dat', function = 'spline3', order = 9)
 
 def calibrate():
     namelst = [i.split('\n')[0] for i in file(targetoutput)]
     for i in namelst:
         iraf.twodspec()
-        iraf.longslit(dispaxis = 2, nsum = 1, observatory = 'Lijiang', 
+        iraf.longslit(dispaxis = 2, nsum = 1, observatory = 'Lijiang',
                 extinction = 'onedstds$LJextinct.dat', caldir = 'onedstds$ctiocal/')
-        iraf.calibrate(input = i, output = i.split('.')[0] + 'f.fits', 
-                extinct = 'yes', flux = 'yes', extinction = 'onedstds$LJextinct.dat', 
+        iraf.calibrate(input = i, output = i.split('.')[0] + 'f.fits',
+                extinct = 'yes', flux = 'yes', extinction = 'onedstds$LJextinct.dat',
                 ignoreaps = 'yes', sensitivity = 'sens', fnu = 'no')
 
 def main():
