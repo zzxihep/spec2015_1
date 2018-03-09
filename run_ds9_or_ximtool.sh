@@ -22,5 +22,5 @@ elif [[ $pathximtool != "" ]]; then
     echo run ximtool
     ximtool &
 else
-    echo "No ds9 or ximtool command found in this operating system !!"
+    echo "No ds9 and ximtool command found in this operating system !!"
 fi
