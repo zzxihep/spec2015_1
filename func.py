@@ -14,7 +14,7 @@ basic function of project spec2015_1
 import os
 import shutil
 import webbrowser
-import pyfits
+from astropy.io import fits as pyfits
 from pyraf import iraf
 try:
     from termcolor import colored

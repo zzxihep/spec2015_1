@@ -6,7 +6,7 @@ mv useless dir to other/ dir
 import os
 import glob
 import shutil
-import pyfits
+from astropy.io import fits as pyfits
 import func
 
 

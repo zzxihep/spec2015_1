@@ -2,7 +2,7 @@
 
 import os
 import glob
-import pyfits
+from astropy.io import fits as pyfits
 from pyraf import iraf
 import func
 

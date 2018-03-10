@@ -3,7 +3,7 @@
 
 import sys
 # from astropy import time
-import pyfits
+from astropy.io import fits as pyfits
 import ephem
 from pyraf import iraf
 import func

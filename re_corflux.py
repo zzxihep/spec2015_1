@@ -7,7 +7,7 @@ Created on Thu Nov  5 22:08:34 2015
 """
 
 import os
-import pyfits
+from astropy.io import fits as pyfits
 from pyraf import iraf
 from func import colored
 from func import script_path

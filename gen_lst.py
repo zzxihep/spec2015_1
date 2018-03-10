@@ -23,7 +23,7 @@ the lst file include :
 
 import os
 import glob
-import pyfits
+from astropy.io import fits as pyfits
 from func import colored
 import func
 

@@ -52,7 +52,6 @@ mark_awftbo*.fits
 - ephem
 - matplotlib
 - numpy
-- pyfits
 - pyraf
 - scipy
 - termcolor

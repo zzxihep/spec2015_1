@@ -12,7 +12,7 @@ import re
 import os
 import glob
 import shutil
-import pyfits
+from astropy.io import fits as pyfits
 from func import is_spec
 
 
