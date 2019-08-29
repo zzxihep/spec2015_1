@@ -36,7 +36,7 @@ def standard(namelst):
     for std_fitsname in namelst:
         stdname, stdmag, stdmagband = func.standard_star_info(std_fitsname)
         print(colored('the standard star is ' + stdname, 'green'))
-        wid, sep = get_band_width_sep(namelst[0])
+        wid, sep = get_band_width_sep(std_fitsname)
         airmas = pyfits.getval(std_fitsname, 'airmass')
         exposure = pyfits.getval(std_fitsname, 'exptime')
         iraf.standard(input=std_fitsname, output='Std', samestar=True,
