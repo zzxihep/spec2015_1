@@ -30,24 +30,23 @@ def standard(namelst):
     iraf.twodspec()
     iraf.longslit(dispaxis=2, nsum=1, observatory=func.obs.name,
                   extinction=extpath, caldir=stdpath)
-    stdnamelst = []
-    for std_fitsname in namelst:
-        stdname, stdmag, stdmagband = func.standard_star_info(std_fitsname)
-        print(colored('the standard star is ' + stdname, 'green'))
-        stdnamelst.append(std_fitsname)
-    stdnamestr = func.to_str(stdnamelst)
     if os.path.isfile('Std'):
         print('remove file Std')
         os.remove('Std')
-    wid, sep = get_band_width_sep(namelst[0])
-    iraf.standard(input=stdnamestr, output='Std', samestar=True,
-                  beam_switch=False, apertures='', bandwidth=wid,
-                  bandsep=sep,  # 30.0  20.0
-                  fnuzero=3.6800000000000E-20, extinction=extpath,
-                  caldir=stdpath, observatory=func.obs.name, interact=True,
-                  graphics='stdgraph', cursor='', star_name=stdname,
-                  airmass='', exptime='', mag=stdmag, magband=stdmagband,
-                  teff='', answer='yes')
+    for std_fitsname in namelst:
+        stdname, stdmag, stdmagband = func.standard_star_info(std_fitsname)
+        print(colored('the standard star is ' + stdname, 'green'))
+        wid, sep = get_band_width_sep(namelst[0])
+        airmas = pyfits.getval(std_fitsname, 'airmass')
+        exposure = pyfits.getval(std_fitsname, 'exptime')
+        iraf.standard(input=std_fitsname, output='Std', samestar=True,
+                    beam_switch=False, apertures='', bandwidth=wid,
+                    bandsep=sep,  # 30.0  20.0
+                    fnuzero=3.6800000000000E-20, extinction=extpath,
+                    caldir=stdpath, observatory=func.obs.name, interact=True,
+                    graphics='stdgraph', cursor='', star_name=stdname,
+                    airmass=airmas, exptime=exposure, mag=stdmag,
+                    magband=stdmagband, teff='', answer='yes')
     if os.path.isfile('Sens.fits'):
         print('remove file Sens.fits')
         os.remove('Sens.fits')
